@@ -1,6 +1,6 @@
-# MCP 实战
+# MCP 天气工具演示
 
-Model Context Protocol (MCP) 入门示例项目，包含服务器和客户端实现。
+这个项目演示了如何使用 Model Context Protocol (MCP) 创建一个客户端-服务器架构，让 AI 模型可以通过工具获取实时天气信息。
 
 ## 项目介绍
 
@@ -18,7 +18,7 @@ MCP 是一种开放协议，允许大语言模型（如 Claude）与外部系统
 
 ## 项目架构
 
-项目分为两个主要部分：
+项目分为以下主要部分：
 
 1. **MCP 服务器**：提供天气相关工具，包括获取天气预警和天气预报功能
 2. **MCP 客户端**：连接服务器，发送工具调用请求，处理返回结果
@@ -26,7 +26,7 @@ MCP 是一种开放协议，允许大语言模型（如 Claude）与外部系统
 
 ### 技术栈
 
-- **编程语言**：Python 3.10.12 ; Nodejs 22.14.0 ; NPM 10.9.2
+- **编程语言**：Python 3.10.12 ; Nodejs 22.14.0 ; Npm 10.9.2
 - **部署环境**：Ubuntu 22.04
 - **核心依赖**：
   - MCP SDK 1.5.0
@@ -54,11 +54,11 @@ mcp_demo/
 ### 系统交互图
 
 ```
-┌─────────────┐     stdio     ┌─────────────┐
-│             │◄────────────►│             │
-│  MCP 客户端  │              │  MCP 服务器  │
-│             │              │             │
-└─────────────┘              └─────────────┘
+┌─────────────┐     stdio    ┌──────────────┐
+│             │◄────────────►│              │
+│  MCP 客户端  │                MCP 服务器   │
+│             │              │              │
+└─────────────┘              └──────────────┘
                                    ▲
                                    │
                               调试 │
@@ -71,18 +71,12 @@ mcp_demo/
                             └─────────────┘
 ```
 
-## 业务流程
+## 功能介绍
 
-MCP 的基本工作流程如下：
+本项目提供以下功能：
 
-1. **服务器注册工具**：MCP 服务器定义并注册工具，提供工具的元数据信息（名称、描述、参数等）
-2. **客户端连接服务器**：客户端通过传输层（如 STDIO）连接到服务器
-3. **客户端获取工具定义**：客户端从服务器获取可用工具的定义
-4. **用户选择工具**：用户通过客户端界面选择要使用的工具和参数
-5. **客户端发送执行请求**：客户端发送工具执行请求到服务器
-6. **服务器执行工具**：服务器处理请求，执行相应的工具函数
-7. **服务器返回结果**：服务器将执行结果返回给客户端
-8. **客户端展示结果**：客户端处理并展示执行结果
+1. **天气预警查询**：获取美国各州的天气预警信息
+2. **天气预报查询**：根据经纬度获取详细的天气预报
 
 ### 服务器实现说明
 
@@ -131,34 +125,73 @@ source venv_mcp_demo/bin/activate
 pip install -r requirements.txt
 ```
 
-### 使用说明
+## 运行方式
 
-#### 运行服务器（独立模式）：
-
-```bash
-python server/weather_server.py
-```
-
-服务器将启动并等待客户端连接，通过 STDIO 传输层通信。
-
-#### 运行客户端：
+### 方法一：使用Python启动
 
 ```bash
 python client/mcp_client.py
 ```
-
-客户端会自动启动服务器并连接。
-
-#### 使用脚本一键启动：
-
+#### 调用示例
 ```bash
-chmod +x run.sh  # 确保脚本可执行
-./run.sh
+(venv_mcp_demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp_demo/client# python mcp_client.py 
+启动 MCP 服务器进程...
+已连接到服务器，可用工具: 2
+  - get_alerts: 
+    获取美国某州的天气预警
+    
+    参数:
+        state: 美国州的两字母代码 (例如 CA, NY)
+        
+    返回:
+        格式化的预警信息字符串
+    
+  - get_forecast: 
+    获取指定经纬度位置的天气预报
+    
+    参数:
+        latitude: 位置的纬度
+        longitude: 位置的经度
+        
+    返回:
+        格式化的天气预报字符串
+    
+
+使用 'help' 查看帮助，使用 'exit' 退出
+
+> help
+
+可用命令:
+  help - 显示此帮助信息
+  list - 列出可用工具
+  call <工具名> <参数JSON> - 调用工具
+  exit - 退出程序
+
+示例:
+  call get_alerts CA
+  call get_forecast 37.7749 -122.4194
 ```
 
-此脚本会自动创建虚拟环境、安装依赖并启动客户端。
+##### 天气预警查询
+```bash
+> call get_alerts CA
+正在调用工具...
 
-#### 使用 MCP Inspector 进行调试：
+结果:
+[TextContent(type='text', text='\n事件: Beach Hazards Statement\n区域: Orange County Coastal\n严重程度: Moderate\n描述: * WHAT...Elevated surf of 4 to 6 ft, with sets to 7 ft expected.\n\n* WHERE...Orange County Beaches.\n\n* WHEN...From Sunday morning through Wednesday evening.\n\n* IMPACTS...Strong rip currents will create hazardous swimming\nconditions.\n\n* ADDITIONAL DETAILS...A 2 to 3 ft swell from 190 to 200 degrees\nwith a 16 to 18 second period. Highest surf will occur on\nsouth/southwest facing beaches.\n指导意见: Remain out of the water to avoid hazardous swimming conditions.\n\n---\n\n事件: High Wind Warning\n区域: Mojave Desert Slopes\n严重程度: Severe\n描述: * WHAT...Southwest winds 30 to 40 mph with gusts up to 60 mph.\n\n* WHERE...Mojave Desert Slopes.\n\n* WHEN...Until 5 AM PDT Sunday.\n\n* IMPACTS...Damaging winds will blow down trees and power lines.\nWidespread power outages are expected. Travel will be difficult,\nespecially for high profile vehicles.\n\n* ADDITIONAL DETAILS...The greatest impact will be along US highway\n395, and State Routes 14, 58, and 178.\n指导意见: Remain in the lower levels of your home during the windstorm, and\navoid windows. Watch for falling debris and tree limbs. Use caution\nif you must drive.\n\n---\n\n事件: Wind Advisory\n区域: Indian Wells Valley; Mojave Desert\n严重程度: Moderate\n描述: * WHAT...Southwest winds 15 to 25 mph with gusts up to 45 mph.\n\n* WHERE...Indian Wells Valley and Mojave Desert.\n\n* WHEN...Until 11 AM PDT Sunday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.\n指导意见: Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.\n\n---\n\n事件: Winter Weather Advisory\n区域: South End of the Upper Sierra; Piute Walker Basin; Tehachapi; Grapevine; Frazier Mountain Communities\n严重程度: Moderate\n描述: * WHAT...Snow expected, mainly above 5,000 feet. Additional snow\naccumulations up to 5 inches.\n\n* WHERE...Frazier Mountain Communities, Grapevine, Piute Walker\nBasin, South End of the Upper Sierra, and Tehachapi.\n\n* WHEN...Until 11 AM PDT Sunday.\n\n* IMPACTS...Plan on slippery road conditions. Gusty winds could\nbring down tree branches.\n指导意见: Slow down and use caution while traveling. The latest road\nconditions for the state you are calling from can be obtained by\ncalling 5 1 1.\n\n---\n\n事件: Winter Weather Advisory\n区域: Yosemite NP outside of the valley; San Joaquin River Canyon; Upper San Joaquin River; Kaiser to Rodgers Ridge; Kings Canyon NP; Grant Grove Area; Sequoia NP\n严重程度: Moderate\n描述: * WHAT...Snow. Additional snow accumulations up to 6 inches.\n\n* WHERE...Sierra Nevada above 5,000 feet.\n\n* WHEN...Until 11 AM PDT Sunday.\n\n* IMPACTS...Travel could be very difficult.\n指导意见: Plan on slippery road conditions. Gusty winds could bring down tree\nbranches. Slow down and use caution while traveling. The latest road\nconditions for the state you are calling from can be obtained by\ncalling 5 1 1.\n\n---\n\n事件: Winter Weather Advisory\n区域: Mono\n严重程度: Moderate\n描述: * WHAT...Snow. Additional snow accumulations 1 to 4 inches, with up\nto 6 inches near the Sierra crest. Ridge wind gusts up to 45 mph.\n\n* WHERE...Mono County.\n\n* WHEN...Until 11 AM PDT Sunday.\n\n* IMPACTS...Snow will produce poor visibility and difficult driving\nconditions at times, especially for higher elevation sections of\nHighway 395.\n\n* ADDITIONAL DETAILS...While snow is less likely to accumulate on\nroads during the daytime hours, some roads could become snow\ncovered or slushy late tonight into early Sunday morning.\n指导意见: Slow down and use caution while traveling. The latest road\nconditions for the state you are calling from can be obtained by\ncalling 5 1 1.\n\n---\n\n事件: Winter Weather Advisory\n区域: Greater Lake Tahoe Area; Greater Lake Tahoe Area\n严重程度: Moderate\n描述: * WHAT...Snow. Additional snow accumulation 2 to 6 inches, with up\nto 9 inches for higher peaks. Ridge wind gusts up to 50 mph.\n\n* WHERE...Greater Lake Tahoe Area.\n\n* WHEN...Until 11 AM PDT Sunday.\n\n* IMPACTS...Snow will produce poor visibility and difficult driving\nconditions at times in and near the Tahoe basin. Scattered snow\nshowers continue through this evening, then another round of\nsteady snow is likely overnight into Sunday morning.\n\n* ADDITIONAL DETAILS...While snow is less likely to accumulate on\nroads during the daytime hours, some roads could become snow\ncovered or slushy late tonight into early Sunday morning.\n指导意见: Slow down and use caution while traveling. The latest road\nconditions for the state you are calling from can be obtained by\ncalling 5 1 1.\n\n---\n\n事件: Winter Weather Advisory\n区域: Western Plumas County/Lassen Park; West Slope Northern Sierra Nevada\n严重程度: Moderate\n描述: * WHAT...Moderate snow expected above 6000 feet. Additional snow\naccumulations of 5 to 10 inches. Winds gusting up to 35 mph.\n\n* WHERE...West Slope Northern Sierra Nevada and Western Plumas\nCounty/Lassen Park Counties.\n\n* WHEN...Until 11 AM PDT Sunday.\n\n* IMPACTS...Plan on slippery road conditions. The hazardous\nconditions could impact weekend travel.\n\n* ADDITIONAL DETAILS...Snow levels around 5000-6000 feet. Light\nsnowfall accumulations possible down to around 5500 feet.\n指导意见: Check the latest road conditions from Caltrans online at\nquickmap.dot.ca.gov or dial 5 1 1.\n\n---\n\n事件: Wind Advisory\n区域: Imperial County Southwest\n严重程度: Moderate\n描述: * WHAT...West winds 25 to 35 mph with gusts up to 55 mph.\n\n* WHERE...Southwest corner of Imperial County.\n\n* WHEN...Until 5 AM PDT Sunday.\n\n* IMPACTS...Difficult driving conditions, especially for larger\nvehicles traveling along roads with crosswinds. Light, unsecured\nobjects may become airborne.\n指导意见: A Wind Advisory means that sustained wind speeds of between 30 and\n40 mph are expected, or wind gusts of between 40 and 58 mph. Winds\nthis strong can make driving difficult, especially for high profile\nvehicles.\n\n---\n\n事件: Beach Hazards Statement\n区域: Malibu Coast; Los Angeles County Beaches\n严重程度: Moderate\n描述: * WHAT...Breaking waves up to 6 feet for south facing beaches and\ndangerous rip currents due to a long lived, long period south\nswell. Minor nuisance flooding may occur Monday and Tuesday\nbetween 6 PM and 3 AM during high tide.\n\n* WHERE...Malibu Coast and Los Angeles County Beaches.\n\n* WHEN...From Sunday morning through Wednesday evening.\n\n* IMPACTS...There is an increased risk of ocean drowning. Rip\ncurrents can pull swimmers and surfers out to sea. Waves can\nwash people off beaches and rocks, and capsize small boats\nnearshore.\n指导意见: Remain out of the water due to hazardous swimming conditions, or\nstay near occupied lifeguard towers. Rock jetties can be deadly\nin such conditions, stay off the rocks.\n', annotations=None)]
+```
+
+##### 天气预报查询
+```bash
+> call get_forecast 37.7749 -122.4194
+正在调用工具...
+
+结果:
+[TextContent(type='text', text='\nTonight:\n温度: 50°F\n风况: 7 mph W\n预报: A chance of rain before 5am. Mostly cloudy, with a low around 50. West wind around 7 mph. Chance of precipitation is 30%.\n\n---\n\nSunday:\n温度: 60°F\n风况: 6 to 10 mph W\n预报: Partly sunny, with a high near 60. West wind 6 to 10 mph.\n\n---\n\nSunday Night:\n温度: 49°F\n风况: 2 to 10 mph SW\n预报: Patchy fog after 3am. Mostly clear, with a low around 49. Southwest wind 2 to 10 mph.\n\n---\n\nMonday:\n温度: 65°F\n风况: 1 to 10 mph SW\n预报: Patchy fog before 8am. Mostly sunny, with a high near 65. Southwest wind 1 to 10 mph.\n\n---\n\nMonday Night:\n温度: 51°F\n风况: 2 to 10 mph WSW\n预报: Patchy fog after 4am. Mostly clear, with a low around 51. West southwest wind 2 to 10 mph.\n', annotations=None)]
+
+```
+
+### 方法二： 使用 MCP Inspector调试：
 
 MCP Inspector 是一个可视化工具，可帮助调试和测试 MCP 服务器。要使用 MCP Inspector：
 
@@ -188,59 +221,14 @@ npx @modelcontextprotocol/inspector python server/weather_server.py
 
 4. **通过 Inspector 调试**：
    - 查看可用工具及其描述
-   ![查看可用工具及其描述](./doc/img/MCP%20Inspector01.png)
    - 填写参数并执行工具
-   
    - 查看执行结果和错误信息
    - 检查请求历史和服务器响应
+   ![查看可用工具及其描述](./doc/img/MCP%20Inspector01.png)
+   ![获取旧金山天气预报](./doc/img/MCP%20Inspector02.png)
 
 > **提示**：MCP Inspector 提供了更直观的界面来测试和调试 MCP 服务器，特别适合开发和调试复杂工具。
 
-#### 客户端命令：
-
-- `help` - 显示帮助信息
-- `list` - 列出可用工具
-- `call <工具名> <参数>` - 调用工具
-  - 例如：`call get_alerts CA`
-  - 例如：`call get_forecast 37.7749 -122.4194`
-- `exit` - 退出程序
-
-## 示例
-
-### 获取加州天气预警：
-
-```
-> call get_alerts CA
-正在调用工具...
-
-结果:
-当前 CA 州没有活动预警。
-```
-
-### 获取旧金山天气预报：
-
-```
-> call get_forecast 37.7749 -122.4194
-正在调用工具...
-
-结果:
-今天:
-温度: 75°F
-风况: 5 to 10 mph W
-预报: 晴朗。最高温度接近 75°F。西风 5 到 10 mph。
-
----
-今晚:
-温度: 58°F
-风况: 5 to 10 mph W
-预报: 多云。最低温度接近 58°F。西风 5 到 10 mph。
-
----
-周二:
-温度: 70°F
-风况: 5 to 10 mph W
-预报: 多云转晴。最高温度接近 70°F。西风 5 到 10 mph。
-```
 
 ## 常见问题
 

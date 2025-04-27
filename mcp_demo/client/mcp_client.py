@@ -13,10 +13,11 @@ import os
 import subprocess
 import sys
 from typing import Dict, Any, List, Optional
+from contextlib import AsyncExitStack
 
-from mcp.client import ExecutionRequest, ToolCallResult, ToolCall, ToolDefinition
-from mcp.transport.stdio import StdioTransport
-from mcp.client.hosted import HostedClient
+# 使用正确的 MCP 导入
+from mcp import ClientSession, StdioServerParameters, Tool
+from mcp.client.stdio import stdio_client
 
 class SimpleClientApp:
     """简单的 MCP 客户端应用"""
@@ -32,33 +33,33 @@ class SimpleClientApp:
         self.server_process = None
         self.client = None
         self.tool_definitions = []
+        self.exit_stack = AsyncExitStack()
     
     async def start(self):
         """启动 MCP 客户端并连接到服务器"""
         print("启动 MCP 服务器进程...")
         
-        # 启动服务器进程
-        self.server_process = subprocess.Popen(
-            self.server_command,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            bufsize=1
+        # 配置服务器参数
+        server_params = StdioServerParameters(
+            command=self.server_command[0],
+            args=self.server_command[1:],
+            env=None  # 使用默认环境变量
         )
         
-        # 创建 STDIO 传输器
-        transport = StdioTransport(
-            self.server_process.stdout,
-            self.server_process.stdin
-        )
+        # 启动服务器并获取通信流
+        read_write = await self.exit_stack.enter_async_context(stdio_client(server_params))
+        read, write = read_write
         
-        # 创建 MCP 客户端
-        self.client = HostedClient(transport)
-        await self.client.start()
+        # 创建 MCP 客户端会话
+        self.client = await self.exit_stack.enter_async_context(ClientSession(read, write))
+        
+        # 初始化连接
+        await self.client.initialize()
         
         # 获取工具定义
-        self.tool_definitions = await self.client.get_tool_definitions()
+        response = await self.client.list_tools()
+        self.tool_definitions = response.tools
+        
         print(f"已连接到服务器，可用工具: {len(self.tool_definitions)}")
         
         for tool in self.tool_definitions:
@@ -82,22 +83,13 @@ class SimpleClientApp:
         if not tool_def:
             return f"错误: 未找到工具 '{tool_name}'"
         
-        # 创建工具调用
-        tool_call = ToolCall(name=tool_name, parameters=params)
-        
-        # 创建执行请求
-        request = ExecutionRequest(tool_calls=[tool_call])
-        
         try:
-            # 发送请求并等待结果
-            result = await self.client.execute_tools(request)
+            # 调用工具并等待结果
+            result = await self.client.call_tool(tool_name, arguments=params)
             
             # 处理结果
-            if result.results and len(result.results) > 0:
-                tool_result = result.results[0]
-                if tool_result.error:
-                    return f"工具执行错误: {tool_result.error}"
-                return tool_result.result
+            if result and hasattr(result, 'content'):
+                return result.content
             else:
                 return "工具执行未返回任何结果"
         
@@ -107,17 +99,7 @@ class SimpleClientApp:
     async def stop(self):
         """停止客户端和服务器"""
         print("正在关闭 MCP 客户端...")
-        if self.client:
-            await self.client.stop()
-        
-        if self.server_process:
-            print("正在关闭服务器进程...")
-            self.server_process.terminate()
-            try:
-                self.server_process.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                self.server_process.kill()
-        
+        await self.exit_stack.aclose()
         print("已关闭")
     
     def print_help(self):
@@ -136,10 +118,13 @@ class SimpleClientApp:
         print("\n可用工具:")
         for tool in self.tool_definitions:
             print(f"  {tool.name} - {tool.description}")
-            if tool.parameters:
+            if hasattr(tool, 'inputSchema') and tool.inputSchema:
                 print("    参数:")
-                for param in tool.parameters:
-                    print(f"      {param.name} ({param.type}): {param.description}")
+                props = tool.inputSchema.get('properties', {})
+                for param_name, param_info in props.items():
+                    param_type = param_info.get('type', 'unknown')
+                    param_desc = param_info.get('description', '')
+                    print(f"      {param_name} ({param_type}): {param_desc}")
 
 async def main():
     """主函数"""
