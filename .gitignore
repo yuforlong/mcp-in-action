@@ -172,3 +172,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# MCP 演示程序
+mcp_demo/venv_mcp_demo/
