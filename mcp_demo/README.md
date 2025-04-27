@@ -188,7 +188,9 @@ npx @modelcontextprotocol/inspector python server/weather_server.py
 
 4. **通过 Inspector 调试**：
    - 查看可用工具及其描述
+   ![查看可用工具及其描述](./doc/img/MCP%20Inspector01.png)
    - 填写参数并执行工具
+   
    - 查看执行结果和错误信息
    - 检查请求历史和服务器响应
 
