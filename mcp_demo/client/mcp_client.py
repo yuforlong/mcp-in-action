@@ -110,8 +110,9 @@ class SimpleClientApp:
         print("  call <工具名> <参数JSON> - 调用工具")
         print("  exit - 退出程序")
         print("\n示例:")
-        print("  call get_alerts CA")
-        print("  call get_forecast 37.7749 -122.4194")
+        print("  call get_weather_warning 101010100")
+        print("  call get_daily_forecast 116.41,39.92")
+        print("  call get_daily_forecast 101010100 7")
     
     def print_tools(self):
         """打印工具列表和描述"""
@@ -183,21 +184,26 @@ async def main():
                         except json.JSONDecodeError:
                             # 如果不是 JSON，尝试简单解析
                             try:
-                                # 对于 get_alerts，只需要一个状态参数
-                                if tool_name == "get_alerts":
-                                    params = {"state": params_str}
+                                # 对于 get_weather_warning，只需要一个位置参数
+                                if tool_name == "get_weather_warning":
+                                    params = {"location": params_str}
                                 
-                                # 对于 get_forecast，需要纬度和经度
-                                elif tool_name == "get_forecast":
-                                    lat_lon = params_str.split()
-                                    if len(lat_lon) != 2:
-                                        print("错误: get_forecast 需要两个参数: 纬度 经度")
+                                # 对于 get_daily_forecast，需要位置和可选的天数
+                                elif tool_name == "get_daily_forecast":
+                                    forecast_args = params_str.split()
+                                    if len(forecast_args) < 1:
+                                        print("错误: get_daily_forecast 至少需要一个位置参数")
                                         continue
                                     
-                                    params = {
-                                        "latitude": float(lat_lon[0]),
-                                        "longitude": float(lat_lon[1])
-                                    }
+                                    params = {"location": forecast_args[0]}
+                                    
+                                    # 如果提供了天数参数
+                                    if len(forecast_args) > 1:
+                                        try:
+                                            params["days"] = int(forecast_args[1])
+                                        except ValueError:
+                                            print("错误: days 参数必须是整数")
+                                            continue
                                 else:
                                     print(f"错误: 无法解析 {tool_name} 的参数")
                                     continue
