@@ -110,7 +110,7 @@ class SimpleClientApp:
         print("  call <工具名> <参数JSON> - 调用工具")
         print("  exit - 退出程序")
         print("\n示例:")
-        print("  call get_weather_warning 101010100")
+        print("  call get_weather_warning {\"location\": \"101010100\"}")
         print("  call get_daily_forecast 116.41,39.92")
         print("  call get_daily_forecast 101010100 7")
     

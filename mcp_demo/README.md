@@ -199,7 +199,7 @@ python client/mcp_client.py
   exit - 退出程序
 
 示例:
-  call get_weather_warning 101010100
+  call get_weather_warning {"location": "101010100"}
   call get_daily_forecast 116.41,39.92
   call get_daily_forecast 101010100 7
 
@@ -207,7 +207,7 @@ python client/mcp_client.py
 
 ##### 天气预警查询示例
 ```bash
-> call get_weather_warning 101230201
+> call get_weather_warning {"location": "101010100"}
 正在调用工具...
 
 结果:
