@@ -1,5 +1,5 @@
 # MCP In Action
----
+
 ![GitHub stars](https://img.shields.io/github/stars/FlyAIBox/mcp-in-action?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/FlyAIBox/mcp-in-action?style=social)
 ![GitHub watchers](https://img.shields.io/github/watchers/FlyAIBox/mcp-in-action?style=social)
