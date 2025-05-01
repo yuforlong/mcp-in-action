@@ -2,6 +2,14 @@
 
 ![MCP Banner](https://img.shields.io/badge/MCP-In%20Action-blue)
 
+![GitHub stars](https://img.shields.io/github/stars/FlyAIBox/mcp-in-action?style=social)
+![GitHub forks](https://img.shields.io/github/forks/FlyAIBox/mcp-in-action?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/FlyAIBox/mcp-in-action?style=social)
+![GitHub repo size](https://img.shields.io/github/repo-size/FlyAIBox/mcp-in-action)
+![GitHub language count](https://img.shields.io/github/languages/count/FlyAIBox/mcp-in-action)
+![GitHub top language](https://img.shields.io/github/languages/top/FlyAIBox/mcp-in-action)
+![GitHub last commit](https://img.shields.io/github/last-commit/FlyAIBox/mcp-in-action?color=red)
+
 ## 简介
 
 MCP In Action 是一个实战项目，旨在帮助开发者快速掌握 Model Context Protocol (MCP) 的开发与应用。本项目通过实际案例展示如何构建基于 MCP 的应用，使大语言模型能够与外部工具和数据源进行交互，从而增强模型的能力范围。
@@ -130,7 +138,13 @@ MCP 是一个允许大语言模型与外部工具和服务进行通信的协议�
 4. 推送到分支 (`git push origin feature/amazing-feature`)
 5. 创建 Pull Request
 
+贡献是使开源社区成为学习、激励和创造的惊人之处。非常感谢你所做的任何贡献。如果你有任何建议或功能请求，请先开启一个议题讨论你想要改变的内容。
+
+<a href='https://github.com/repo-reviews/repo-reviews.github.io/blob/main/create.md' target="_blank"><img alt='Github' src='https://img.shields.io/badge/review_me-100000?style=flat&logo=Github&logoColor=white&labelColor=888888&color=555555'/></a>
+
+
 ## 许可证
+该项目根据Apache-2.0许可证的条款进行许可。详情请参见[LICENSE](LICENSE)文件。
 
 本项目采用 [Apache 许可证](LICENSE)。
 
@@ -142,3 +156,13 @@ MCP 是一个允许大语言模型与外部工具和服务进行通信的协议�
 ---
 
 **Model Context Protocol** - 让 AI 模型拥有与世界交互的能力
+
+# ⭐️⭐️⭐️⭐️⭐️
+
+<a href="https://star-history.com/#FlyAIBox/mcp-in-action&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=FlyAIBox/mcp-in-action&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=FlyAIBox/mcp-in-action&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=FlyAIBox/mcp-in-action&type=Date" />
+  </picture>
+</a>
