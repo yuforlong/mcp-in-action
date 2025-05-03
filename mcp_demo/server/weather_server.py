@@ -15,6 +15,9 @@ MCP 天气服务器
 提供两个工具：
 1. get_weather_warning: 获取指定城市ID或经纬度的天气灾害预警
 2. get_daily_forecast: 获取指定城市ID或经纬度的天气预报
+
+Author: FlyAIBox
+Date: 2025.05.03
 """
 
 from typing import Any, Dict, List, Optional, Union
