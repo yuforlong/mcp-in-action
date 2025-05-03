@@ -289,69 +289,97 @@ DEEPSEEK_BASE_URL=https://api.deepseek.com   # DeepSeek API 的基础 URL
 DEEPSEEK_MODEL=deepseek-chat                 # 使用的 DeepSeek 模型名称
 ```
 
-启动客户端
+#### 启动客户端
 ```bash
 python client/mcp_client_deepseek.py
 ```
-查询成都天气
+
+#### 简单天气查询
+
+**用户**：北京今天天气怎么样？
+
+**系统处理流程**：
+1. DeepSeek模型识别出这是天气查询
+2. 自动选择`get_daily_forecast`工具
+3. 确定参数：`location="101010100"`（北京城市ID）
+4. 执行工具并获取天气数据
+5. 生成人性化响应
+
+**智能助手**：
+
 ```bash
 (venv_mcp_demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp_demo# python client/mcp_client_deepseek.py
-2025-05-03 13:42:25,059 - INFO - 成功连接到 MCP 服务器
-2025-05-03 13:42:25,059 - INFO - 开始聊天会话...
+2025-05-03 14:25:12,273 - INFO - 成功连接到 MCP 服务器
+2025-05-03 14:25:12,273 - INFO - 开始聊天会话...
 
-请输入您的问题 (输入 'quit' 或 'exit' 退出): 成都天气
-2025-05-03 13:42:39,345 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
-2025-05-03 13:42:44,761 - INFO - 执行工具 get_daily_forecast，参数: {'location': '101270101', 'days': 3}
-2025-05-03 13:42:44,985 - INFO - 工具执行完成: get_daily_forecast
-2025-05-03 13:42:45,055 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+请输入您的问题 (输入 'quit' 或 'exit' 退出): 北京今天天气怎么样？
+2025-05-03 14:25:20,775 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-05-03 14:25:25,736 - INFO - 执行工具 get_daily_forecast，参数: {'location': 101010100, 'days': 1}
+2025-05-03 14:25:26,850 - INFO - 工具执行完成: get_daily_forecast
+2025-05-03 14:25:26,918 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
 
-助手: 以下是成都市未来3天的天气预报：
+助手: 今天是2025年5月3日，北京的天气情况如下：
 
-**2025年5月3日（周六）**
-- 天气：白天阴，夜间阴
-- 温度：最高31°C，最低19°C
-- 风向：北风1-3级（3km/h）
-- 相对湿度：66%
-- 降水量：0.0mm
-- 紫外线指数：5（中等）
-- 能见度：25km
+- 天气：全天晴朗
+- 温度：最低10°C，最高25°C（昼夜温差较大请注意增减衣物）
+- 风向风力：白天西北风1-3级(3km/h)，夜间转为西南风1-3级
+- 湿度：干燥（相对湿度仅15%）
+- 紫外线：强（指数9，需做好防晒措施）
+- 能见度：极佳（25公里）
 
-**2025年5月4日（周日）**
-- 天气：白天多云，夜间小雨
-- 温度：最高28°C，最低18°C
-- 风向：北风1-3级（3km/h）
-- 相对湿度：79%
-- 降水量：0.0mm
-- 紫外线指数：6（中等）
-- 能见度：24km
+日出时间05:13，日落时间19:11。今天无降水概率，适合户外活动。
 
-**2025年5月5日（周一）**
-- 天气：白天阴，夜间小雨
-- 温度：最高30°C，最低18°C
-- 风向：北风1-3级（3km/h）
-- 相对湿度：75%
-- 降水量：0.0mm
-- 紫外线指数：11（极高）
-- 能见度：25km
-
-请注意，5月4日和5月5日夜间有小雨，建议携带雨具。5月5日的紫外线指数较高，外出时请注意防晒。
+请输入您的问题 (输入 'quit' 或 'exit' 退出): 
 ```
 
-查询成都灾害预警
+#### 复杂天气查询
+
+**用户**：最近一周郑州有没有高温或大风预警？周末适合户外活动吗？
+
+**系统处理流程**：
+
+1. 模型识别出需要两类信息：预警信息和天气预报
+2. 首先调用`get_weather_warning`工具获取预警信息
+3. 然后调用`get_daily_forecast`工具获取周末天气
+4. 综合分析两种数据，给出建议
+
+**智能助手**：
 ```bash
-请输入您的问题 (输入 'quit' 或 'exit' 退出): 成都灾害预警
-2025-05-03 13:44:17,993 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
-2025-05-03 13:44:23,186 - INFO - 执行工具 get_weather_warning，参数: {'location': '101270101'}
-2025-05-03 13:44:23,434 - INFO - 工具执行完成: get_weather_warning
-2025-05-03 13:44:23,522 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+(venv_mcp_demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp_demo# python client/mcp_client_deepseek.py 
+2025-05-03 15:03:51,662 - INFO - 成功连接到 MCP 服务器
+2025-05-03 15:03:51,662 - INFO - 开始聊天会话...
 
-助手: 目前成都市没有活动的天气灾害预警。
+请输入您的问题 (输入 'quit' 或 'exit' 退出): 最近一周郑州有没有高温或大风预警？周末适合户外活动吗？
+2025-05-03 15:04:05,807 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2025-05-03 15:04:11,979 - INFO - 执行工具 get_weather_warning，参数: {'location': '101180101'}
+2025-05-03 15:04:12,244 - INFO - 工具执行完成: get_weather_warning
+2025-05-03 15:04:12,244 - INFO - 执行工具 get_daily_forecast，参数: {'location': '101180101', 'days': 7}
+2025-05-03 15:04:12,463 - INFO - 工具执行完成: get_daily_forecast
+2025-05-03 15:04:12,463 - INFO - 工具调用回合完成，继续与模型交互...
+2025-05-03 15:04:12,539 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
 
-请输入您的问题 (输入 'quit' 或 'exit' 退出): quit
-2025-05-03 13:44:33,812 - INFO - 结束聊天会话...
-2025-05-03 13:44:33,940 - INFO - 服务器资源清理完成
+助手: ### 郑州最近一周的天气情况：
+
+1. **天气预警**：  
+   目前郑州没有高温或大风的预警信息。
+
+2. **天气预报（5月3日至5月9日）**：  
+   - **5月3日（周六）**：多云转阴，气温14°C~25°C，东北风1-3级。  
+   - **5月4日（周日）**：多云转阴，气温18°C~28°C，南风1-3级。  
+   - **5月5日（周一）**：晴天，气温17°C~31°C，西风1-3级。  
+   - **5月6日（周二）**：多云，气温15°C~29°C，西风1-3级。  
+   - **5月7日（周三）**：晴天转阴，气温18°C~31°C，南风1-3级。  
+   - **5月8日（周四）**：阴转多云，气温18°C~28°C，南风1-3级。  
+   - **5月9日（周五）**：阴转多云，气温17°C~29°C，西风1-3级。
+
+### 周末户外活动建议：
+- **周六（5月3日）**：天气多云转阴，气温适中（14°C~25°C），风力较小，适合户外活动。  
+- **周日（5月4日）**：天气多云转阴，气温稍高（18°C~28°C），风力较小，也适合户外活动。
+
+**结论**：周末郑州天气较为舒适，没有极端天气预警，适合安排户外活动。建议根据个人体感选择周六或周日出行。
 
 ```
+
 ## 常见问题
 
 ### 服务器无法启动
