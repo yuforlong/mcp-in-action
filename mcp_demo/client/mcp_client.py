@@ -5,6 +5,9 @@
 MCP 客户端示例
 
 用于与 MCP 服务器交互，调用工具并处理结果
+
+Author: FlyAIBox
+Date: 2025.05.03
 """
 
 import asyncio
