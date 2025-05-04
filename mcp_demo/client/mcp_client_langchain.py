@@ -1,4 +1,15 @@
-# Create server parameters for stdio connection
+"""
+# 集成 DeepSeek 的 MCP 客户端[LangChain版]
+#更详细的使用方法请参考：https://github.com/langchain-ai/langchain-mcp-adapters
+
+# 所需环境变量：
+# DEEPSEEK_API_KEY：DeepSeek API 密钥 (格式：sk-xxxx...)
+# DEEPSEEK_BASE_URL：DeepSeek API 基础 URL (https://api.deepseek.com)
+# DEEPSEEK_MODEL：DeepSeek 模型名称 (例如 deepseek-chat)
+
+Author: FlyAIBox
+Date: 2025.05.04
+"""
 import os
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client

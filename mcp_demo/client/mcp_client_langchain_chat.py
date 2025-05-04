@@ -1,21 +1,29 @@
-# Create server parameters for stdio connection
-import os
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
+"""
+# 集成 DeepSeek 的 MCP 客户端[LangChain版]
+#更详细的使用方法请参考：https://github.com/langchain-ai/langchain-mcp-adapters
+
+# 所需环境变量：
+# DEEPSEEK_API_KEY：DeepSeek API 密钥 (格式：sk-xxxx...)
+# DEEPSEEK_BASE_URL：DeepSeek API 基础 URL (https://api.deepseek.com)
+# DEEPSEEK_MODEL：DeepSeek 模型名称 (例如 deepseek-chat)
+
+Author: FlyAIBox
+Date: 2025.05.04
+"""
 import asyncio
 import logging
-from typing import Optional, Dict, Any, List, Tuple
+import os
 from contextlib import AsyncExitStack
+from typing import List, Optional
 
-from langchain_core.tools import BaseTool, StructuredTool, ToolException
-from langchain_mcp_adapters.tools import load_mcp_tools
-from langgraph.prebuilt import create_react_agent
-from langgraph.prebuilt import chat_agent_executor
-from langchain_core.messages import SystemMessage, HumanMessage
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-
-from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
+from langchain_core.messages import SystemMessage
+from langchain_core.tools import BaseTool
+from langchain_mcp_adapters.tools import load_mcp_tools
+from langchain_openai import ChatOpenAI
+from langgraph.prebuilt import create_react_agent
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
 
 # 配置日志
 logging.basicConfig(
@@ -163,7 +171,7 @@ class MCPClient:
         await self.server.initialize()
         
 
-    async def process_query(self, query: str) -> str:
+    async def process_query(self, query: str):
         """
         处理用户查询，集成工具调用，支持多轮工具交互
 
@@ -246,8 +254,8 @@ class MCPClient:
                     logger.info("结束聊天会话...")
                     break
                     
-                response = await self.process_query(query)
-                print(f"\n助手: {response}")
+                await self.process_query(query)
+                
                 
             except KeyboardInterrupt:
                 logger.info("\n收到键盘中断，结束会话...")
