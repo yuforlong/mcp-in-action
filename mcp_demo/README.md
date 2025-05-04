@@ -123,6 +123,12 @@ mcp_demo/
 - 显示工具执行结果
 - 提供帮助信息
 
+
+## 文档
+1. [MCP实战入门：让AI模型获取实时天气信息](https://mp.weixin.qq.com/s/cJhHf7caaezehEff2GSY_A)
+2. [MCP实战进阶：集成DeepSeek模型与MCP的天气信息助手](https://mp.weixin.qq.com/s/1YIYRVw8yF1zeeLtmnhtYQ)
+3. [MCP实战高阶：借助LangChain打造智能天气助手]()
+
 ## 部署说明
 
 ### 环境要求
