@@ -23,13 +23,13 @@ load_dotenv()
 
 # 配置和风天气API环境变量（如果在环境中不存在）
 if not os.getenv("QWEATHER_API_KEY"):
-    os.environ["QWEATHER_API_KEY"] = "cbddcc26b1c34bb3a577ce916db0389d"  # 请替换为实际的API密钥
+    os.environ["QWEATHER_API_KEY"] = "XXX"  # 请替换为实际的API密钥
 if not os.getenv("QWEATHER_API_BASE"):
     os.environ["QWEATHER_API_BASE"] = "https://n83tefhk3u.re.qweatherapi.com/v7"
 
 # 配置 ChatOpenAI
 model = ChatOpenAI(
-    api_key="sk-7537e51902894ce4a98c58186b55e219",
+    api_key="XXX",
     base_url="https://api.deepseek.com",
     model="deepseek-chat",
     temperature=0
