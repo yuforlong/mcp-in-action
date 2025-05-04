@@ -11,23 +11,9 @@
 # 4. 维护一个交互式聊天循环
 
 # 所需环境变量：
-# OPENAI_API_KEY：DeepSeek API 密钥 (格式：sk-xxxx...)
-# OPENAI_BASE_URL：DeepSeek API 基础 URL (https://api.deepseek.com)
-# OPENAI_MODEL：DeepSeek 模型名称 (例如 deepseek-chat)
-
-Example Usage:
-    ```python
-    async def main():
-        client = MCPClient()
-        try:
-            await client.connect_to_server()
-            await client.chat_loop()
-        finally:
-            await client.cleanup()
-
-    if __name__ == "__main__":
-        asyncio.run(main())
-    ```
+# DEEPSEEK_API_KEY：DeepSeek API 密钥 (格式：sk-xxxx...)
+# DEEPSEEK_BASE_URL：DeepSeek API 基础 URL (https://api.deepseek.com)
+# DEEPSEEK_MODEL：DeepSeek 模型名称 (例如 deepseek-chat)
 
 Author: FlyAIBox
 Date: 2025.05.03
