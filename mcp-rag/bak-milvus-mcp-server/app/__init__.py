@@ -1,1 +1,0 @@
-"""Milvus MCP Server application package.""" 

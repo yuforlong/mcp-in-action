@@ -669,4 +669,4 @@ cython_debug/
 #.idea/
 
 #mcp-rag
-milvus-mcp-server/volumes/
+bak-milvus-mcp-server/volumes/
