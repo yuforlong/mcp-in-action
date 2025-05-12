@@ -1,5 +1,3 @@
-## 中文文档
-
 # Milvus MCP 服务器
 
 基于 Milvus 向量数据库的 MCP（模型上下文协议）服务器的 Python 实现。
@@ -65,6 +63,8 @@ docker compose up -d etcd minio standalone
 
 2. 创建 Python 虚拟环境：
 ```bash
+# 在mcp-rag目录创建
+cd ..
 python -m venv env-mcp-rag
 source env-mcp-rag/bin/activate  
 ```
@@ -116,7 +116,24 @@ data: /messages/?session_id=fef8120bae4d49508a96fa546e613329
 
 ```
 
+7. 本地调试: sse 模式
 
+首先启动服务器`python -m app.main`，然后运行可视化调试界面 MCP Inspector, 根据 Terminal的日志提示打开"http://localhost:5173"进行调试。
+```bash
+  # 启动 MCP Inspector
+  npx @modelcontextprotocol/inspector node build/index.js
+```
+启动效果
+```bash
+(env-mcp-rag) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-rag/milvus-mcp-server# npx @modelcontextprotocol/inspector node build/index.js
+Starting MCP inspector...
+⚙️ Proxy server listening on port 6277
+🔍 MCP Inspector is up and running at http://127.0.0.1:6274 🚀
+```
+
+8. 工具测试
+参考：MCP-Tools-测试文档.md，如下：
+![流程图](../doc/img/milvus-mcp-server-01.png)
 
 ## 系统资源配置说明
 
@@ -149,3 +166,6 @@ data: /messages/?session_id=fef8120bae4d49508a96fa546e613329
 ## 与 MCP 客户端一起使用
 
 该服务器与任何 MCP 客户端兼容。要使用它，请将您的 MCP 客户端指向服务器 URL。
+
+## 参考文档
+1. milvus 可视化客户端--Attu桌面快速入门：https://milvus.io/docs/zh/quickstart_with_attu.md

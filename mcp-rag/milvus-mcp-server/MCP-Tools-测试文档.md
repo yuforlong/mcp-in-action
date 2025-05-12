@@ -24,7 +24,7 @@ POST /api/v1/storeKnowledge
   "content": "这是一个关于Python编程的知识文档。Python是一种面向对象的解释型编程语言，由吉多·范罗苏姆创建于1989年底。Python是纯粹的自由软件，源代码和解释器CPython遵循GPL（GNU General Public License）协议。Python语法简洁而清晰，具有丰富而强大的类库，常被称为胶水语言，可以把用其他语言制作的各种模块很轻松地联结在一起。",
   "metadata": {
     "title": "Python基础知识",
-    "author": "张三",
+    "author": "萤火AI百宝箱",
     "category": "编程",
     "tags": ["Python", "编程语言", "基础知识"]
   }
@@ -49,7 +49,7 @@ curl -X POST "http://localhost:8080/api/v1/storeKnowledge" \
            "content": "这是一个关于Python编程的知识文档。Python是一种面向对象的解释型编程语言，由吉多·范罗苏姆创建于1989年底。Python是纯粹的自由软件，源代码和解释器CPython遵循GPL（GNU General Public License）协议。Python语法简洁而清晰，具有丰富而强大的类库，常被称为胶水语言，可以把用其他语言制作的各种模块很轻松地联结在一起。",
            "metadata": {
              "title": "Python基础知识",
-             "author": "张三",
+             "author": "萤火AI百宝箱",
              "category": "编程",
              "tags": ["Python", "编程语言", "基础知识"]
            }
@@ -90,7 +90,7 @@ POST /api/v1/searchKnowledge
     "content": "这是一个关于Python编程的知识文档。Python是一种面向对象的解释型编程语言，由吉多·范罗苏姆创建于1989年底。Python是纯粹的自由软件，源代码和解释器CPython遵循GPL（GNU General Public License）协议。Python语法简洁而清晰，具有丰富而强大的类库，常被称为胶水语言，可以把用其他语言制作的各种模块很轻松地联结在一起。",
     "metadata": {
       "title": "Python基础知识",
-      "author": "张三",
+      "author": "萤火AI百宝箱",
       "category": "编程",
       "tags": ["Python", "编程语言", "基础知识"]
     }
@@ -128,7 +128,7 @@ POST /api/v1/storeFAQ
   "answer": "在Python中创建虚拟环境可以使用venv模块。首先，打开命令行终端，然后执行以下命令：\n\n```bash\npython -m venv myenv\n```\n\n其中myenv是虚拟环境的名称。创建完成后，使用以下命令激活虚拟环境：\n\n- Windows: `myenv\\Scripts\\activate`\n- macOS/Linux: `source myenv/bin/activate`\n\n激活后，终端提示符前会显示虚拟环境名称，表示当前处于虚拟环境中。",
     "metadata": {
       "title": "Python基础知识",
-      "author": "张三",
+      "author": "萤火AI百宝箱",
       "category": "编程",
       "tags": ["Python", "编程语言", "基础知识"]
     }
@@ -222,7 +222,7 @@ def test_store_knowledge():
         "content": "这是一个关于Python编程的知识文档。Python是一种面向对象的解释型编程语言，由吉多·范罗苏姆创建于1989年底。Python是纯粹的自由软件，源代码和解释器CPython遵循GPL（GNU General Public License）协议。Python语法简洁而清晰，具有丰富而强大的类库，常被称为胶水语言，可以把用其他语言制作的各种模块很轻松地联结在一起。",
         "metadata": {
             "title": "Python基础知识",
-            "author": "张三",
+            "author": "萤火AI百宝箱",
             "category": "编程",
             "tags": ["Python", "编程语言", "基础知识"]
         }
