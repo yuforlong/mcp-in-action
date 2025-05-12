@@ -49,8 +49,16 @@ async def build_knowledge_base(args):
         if not args.no_faq:
             logger.info(f"Extracted and stored {result['extracted_faqs']} FAQs")
             
+        # Properly close MCP client connection
+        await builder.mcp_client.close()
+            
     except Exception as e:
         logger.error(f"Error building knowledge base: {e}")
+        # Ensure client is closed even on exception
+        try:
+            await builder.mcp_client.close()
+        except Exception as close_error:
+            logger.error(f"Error closing MCP client: {close_error}")
         sys.exit(1)
         
 async def query_knowledge_base(args):
@@ -70,8 +78,16 @@ async def query_knowledge_base(args):
         print("回答:", answer)
         print("=" * 80)
         
+        # Properly close MCP client connection
+        await retriever.mcp_client.close()
+        
     except Exception as e:
         logger.error(f"Error querying knowledge base: {e}")
+        # Ensure client is closed even on exception
+        try:
+            await retriever.mcp_client.close()
+        except Exception as close_error:
+            logger.error(f"Error closing MCP client: {close_error}")
         sys.exit(1)
 
 def main():

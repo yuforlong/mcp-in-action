@@ -24,6 +24,16 @@ class MCPClient:
         self.session = None
         logger.info(f"Initialized MCP client with server URL: {server_url}")
         
+    async def __aenter__(self):
+        """Async context manager entry method."""
+        if not self._connected:
+            await self.connect()
+        return self
+        
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Async context manager exit method."""
+        await self.close()
+        
     async def connect(self) -> None:
         """Connect to the MCP server and get available tools."""
         try:
@@ -218,18 +228,23 @@ class MCPClient:
                 # First clear the tools dictionary
                 self.tools = {}
                 
+                # Explicitly set connected flag to False before closing
+                self._connected = False
+                
                 # Close the exit stack which will handle all the async context managers
-                await self.exit_stack.aclose()
-                logger.info("Closed connection to MCP server")
-            except RuntimeError as e:
-                # Ignore specific RuntimeError about generator exit
-                if "generator didn't stop after athrow()" in str(e):
-                    logger.warning("Ignoring known issue when closing SSE connection")
-                else:
-                    logger.error(f"Error closing MCP connection: {str(e)}")
+                try:
+                    await self.exit_stack.aclose()
+                    logger.info("Closed connection to MCP server")
+                except RuntimeError as e:
+                    # Ignore specific RuntimeError about generator exit
+                    if "generator didn't stop after athrow()" in str(e) or "unhandled errors in a TaskGroup" in str(e):
+                        logger.warning(f"Ignoring known SSE connection cleanup issue: {str(e)}")
+                    else:
+                        # Re-raise if it's not the specific error we're handling
+                        raise
             except Exception as e:
                 logger.error(f"Error closing MCP connection: {str(e)}")
             finally:
-                self._connected = False
+                # Ensure these are set to None even if exceptions occur
                 self.session = None
                 self.client = None 
