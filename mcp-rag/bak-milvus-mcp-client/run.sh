@@ -4,8 +4,8 @@
 export MCP_SERVER_HOST="http://localhost:8080/sse"
 export LLM_API_BASE_URL="https://dashscope.aliyuncs.com/compatible-mode/v1"
 export LLM_MODEL="qwen-max"
-export LLM_API_KEY=""  # 此处需要填入有效的API密钥
-export LOG_LEVEL="INFO"  # 日志级别: DEBUG, INFO, WARNING, ERROR, CRITICAL
+export LLM_API_KEY="sk-666814d1fbc447e4f2ab401be341a9a7598"  # 此处需要填入有效的API密钥
+export LOG_LEVEL="DEBUG"  # 日志级别: DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 # 确保脚本可以接收命令行参数
 if [ $# -lt 1 ]; then

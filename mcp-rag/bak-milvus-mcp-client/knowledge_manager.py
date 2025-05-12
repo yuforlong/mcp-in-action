@@ -51,7 +51,7 @@ class MCPClient:
         建立与MCP服务器的连接，包含重试机制
         """
         max_retries = 5
-        retry_delay = 2  # seconds
+        base_delay = 2  # seconds
         
         for attempt in range(max_retries):
             try:
@@ -61,21 +61,40 @@ class MCPClient:
                 stdio_transport = await self.exit_stack.enter_async_context(self._client)  # 进入异步上下文并获取传输对象
                 read, write = stdio_transport  # 解包获取读写通道
                 
-                # 添加短暂延迟以确保服务器初始化完成
-                await asyncio.sleep(1)
+                # 创建会话但不立即使用
+                self.session = await self.exit_stack.enter_async_context(ClientSession(read, write))
                 
-                self.session = await self.exit_stack.enter_async_context(ClientSession(read, write))  # 创建并进入客户端会话
+                # 增加指数退避等待策略，等待服务器完成初始化
+                retry_count = 0
+                max_init_retries = 3
+                while retry_count < max_init_retries:
+                    # 每次重试增加等待时间
+                    wait_time = base_delay * (2 ** retry_count)
+                    logger.info(f"Waiting {wait_time}s for server initialization (retry {retry_count + 1}/{max_init_retries})...")
+                    await asyncio.sleep(wait_time)
+                    
+                    try:
+                        # 尝试获取工具列表来测试连接是否真正就绪
+                        tools = await self.get_available_tools()
+                        logger.info(f"Successfully connected to MCP server on attempt {attempt + 1}")
+                        logger.info(f"Available tools: {', '.join([tool.name for tool in tools])}")
+                        return
+                    except Exception as e:
+                        if "initialization" in str(e).lower():
+                            logger.warning(f"Server not fully initialized yet: {e}")
+                            retry_count += 1
+                        else:
+                            # 如果错误不是初始化相关的，重新抛出
+                            raise
                 
-                # 测试连接，列出可用工具
-                tools = await self.get_available_tools()
-                logger.info(f"Successfully connected to MCP server on attempt {attempt + 1}")
-                logger.info(f"Available tools: {', '.join([tool.name for tool in tools])}")
-                return
+                # 如果达到最大初始化重试次数还未成功，抛出错误
+                raise RuntimeError("Server did not complete initialization in the expected time")
+                
             except Exception as e:
                 if attempt < max_retries - 1:
                     logger.error(f"Connection attempt {attempt + 1} failed: {e}")
-                    logger.info(f"Retrying in {retry_delay} seconds...")
-                    await asyncio.sleep(retry_delay)
+                    logger.info(f"Retrying in {base_delay} seconds...")
+                    await asyncio.sleep(base_delay)
                 else:
                     logger.error(f"Failed to connect after {max_retries} attempts: {e}")
                     raise
