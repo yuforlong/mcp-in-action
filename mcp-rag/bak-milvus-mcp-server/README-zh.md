@@ -66,7 +66,7 @@ docker compose up -d etcd minio standalone
 2. 创建 Python 虚拟环境：
 ```bash
 python -m venv env-mcp-rag
-source env-mcp-rag/bin/activate  # Windows 上使用: env-mcp-rag\Scripts\activate
+source env-mcp-rag/bin/activate  
 ```
 
 3. 安装依赖：
