@@ -90,6 +90,34 @@ async def query_knowledge_base(args):
             logger.error(f"Error closing MCP client: {close_error}")
         sys.exit(1)
 
+def print_usage_guide():
+    """Print detailed usage guide for the application."""
+    print("\n" + "=" * 80)
+    print("Milvus MCP Client 使用指南")
+    print("=" * 80)
+    
+    print("\n构建知识库:")
+    print("-" * 80)
+    print("从文件构建知识库:")
+    print("  python -m app.main build --file <文件路径>")
+    print("\n从文件构建知识库并设置元数据:")
+    print("  python -m app.main build --file <文件路径> --title \"文档标题\" --author \"作者\" --tags \"标签1,标签2\"")
+    print("\n使用自定义分块大小:")
+    print(f"  python -m app.main build --file <文件路径> --chunk-size {DEFAULT_CHUNK_SIZE*2} --chunk-overlap {DEFAULT_CHUNK_OVERLAP*2}")
+    print("\n从文本构建知识库:")
+    print("  python -m app.main build --text \"这是要处理的文本内容\" --title \"内容标题\"")
+    print("\n不提取FAQ:")
+    print("  python -m app.main build --file <文件路径> --no-faq")
+    
+    print("\n查询知识库:")
+    print("-" * 80)
+    print("基本查询:")
+    print("  python -m app.main query --question \"您的问题\"")
+    print("\n指定最大结果数:")
+    print(f"  python -m app.main query --question \"您的问题\" --max-results {MAX_SEARCH_RESULTS*2}")
+    
+    print("\n" + "=" * 80)
+
 def main():
     """Main entry point for the application."""
     parser = argparse.ArgumentParser(description="Milvus MCP Client for knowledge base management and querying")
@@ -111,6 +139,9 @@ def main():
     query_parser.add_argument("--question", type=str, required=True, help="Question to ask")
     query_parser.add_argument("--max-results", type=int, default=MAX_SEARCH_RESULTS, help="Maximum number of search results")
     
+    # Help command
+    help_parser = subparsers.add_parser("help", help="Show detailed usage guide")
+    
     # Parse arguments
     args = parser.parse_args()
     
@@ -119,8 +150,10 @@ def main():
         asyncio.run(build_knowledge_base(args))
     elif args.command == "query":
         asyncio.run(query_knowledge_base(args))
+    elif args.command == "help":
+        print_usage_guide()
     else:
-        parser.print_help()
+        print_usage_guide()
         
 if __name__ == "__main__":
     main() 
