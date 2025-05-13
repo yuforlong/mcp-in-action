@@ -1,3 +1,13 @@
+"""
+知识库构建模块
+功能：负责处理文档和构建向量知识库
+作用：将文本内容切分、处理并存储到Milvus知识库，并提取文档中的常见问题(FAQ)
+主要功能：
+1. 文本切分：将长文本按照语义边界切分成较小的片段
+2. 知识库存储：将文本片段存储到向量知识库中
+3. FAQ提取：使用LLM从文本中自动提取常见问题和答案
+4. 文件处理：读取文件并提取元数据
+"""
 import os
 import asyncio
 from typing import Dict, List, Any, Optional, Union
@@ -8,18 +18,19 @@ from app.llm_client import LLMClient
 from app.config import DEFAULT_CHUNK_SIZE, DEFAULT_CHUNK_OVERLAP
 
 class KnowledgeBuilder:
-    """Knowledge builder for processing and storing documents in the knowledge base."""
+    """知识库构建器，用于处理文档并将其存储到知识库中"""
     
     def __init__(
         self,
         chunk_size: int = DEFAULT_CHUNK_SIZE,
         chunk_overlap: int = DEFAULT_CHUNK_OVERLAP
     ):
-        """Initialize the knowledge builder.
+        """
+        初始化知识库构建器
         
-        Args:
-            chunk_size: The size of text chunks
-            chunk_overlap: The overlap between chunks
+        参数:
+            chunk_size: 文本块的大小
+            chunk_overlap: 文本块之间的重叠大小
         """
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
@@ -33,45 +44,46 @@ class KnowledgeBuilder:
         metadata: Optional[Dict[str, Any]] = None,
         extract_faq: bool = True
     ) -> Dict[str, Any]:
-        """Build knowledge base from text.
-        
-        Args:
-            text: The text content
-            metadata: Optional metadata for the document
-            extract_faq: Whether to extract FAQs from the text
-            
-        Returns:
-            Dictionary with processing results
         """
-        # Connect to MCP server
+        从文本构建知识库
+        
+        参数:
+            text: 文本内容
+            metadata: 文档的可选元数据
+            extract_faq: 是否从文本中提取FAQ
+            
+        返回:
+            包含处理结果的字典
+        """
+        # 连接到MCP服务器
         if not hasattr(self.mcp_client, '_connected') or not self.mcp_client._connected:
             await self.mcp_client.connect()
             
-        # Process text into chunks
+        # 将文本处理成块
         chunks = self._chunk_text(text)
         logger.info(f"Split text into {len(chunks)} chunks")
         
-        # Store chunks in knowledge base
+        # 将块存储到知识库中
         stored_count = 0
         for i, chunk in enumerate(chunks):
             chunk_metadata = metadata.copy() if metadata else {}
             chunk_metadata["chunk_index"] = i
             chunk_metadata["total_chunks"] = len(chunks)
             
-            # Store chunk in knowledge base
+            # 将块存储到知识库中
             try:
                 await self.mcp_client.store_knowledge(content=chunk, metadata=chunk_metadata)
                 stored_count += 1
             except Exception as e:
                 logger.error(f"Failed to store chunk {i}: {str(e)}")
                 
-        # Extract and store FAQs if requested
+        # 如果需要，提取并存储FAQ
         faqs = []
         if extract_faq:
             faqs = await self._extract_faqs(text)
             logger.info(f"Extracted {len(faqs)} FAQs from text")
             
-            # Store FAQs
+            # 存储FAQ
             for faq in faqs:
                 try:
                     await self.mcp_client.store_faq(
@@ -95,24 +107,25 @@ class KnowledgeBuilder:
         metadata: Optional[Dict[str, Any]] = None,
         extract_faq: bool = True
     ) -> Dict[str, Any]:
-        """Build knowledge base from file.
+        """
+        从文件构建知识库
         
-        Args:
-            file_path: Path to the file
-            metadata: Optional metadata for the document
-            extract_faq: Whether to extract FAQs from the text
+        参数:
+            file_path: 文件路径
+            metadata: 文档的可选元数据
+            extract_faq: 是否从文本中提取FAQ
             
-        Returns:
-            Dictionary with processing results
+        返回:
+            包含处理结果的字典
         """
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"File not found: {file_path}")
             
-        # Read file content
+        # 读取文件内容
         with open(file_path, 'r', encoding='utf-8') as f:
             text = f.read()
             
-        # Add file metadata if not provided
+        # 如果未提供元数据，则添加文件元数据
         if metadata is None:
             metadata = {}
         
@@ -120,67 +133,69 @@ class KnowledgeBuilder:
         metadata["file_path"] = file_path
         metadata["file_size"] = os.path.getsize(file_path)
         
-        # Process the file content
+        # 处理文件内容
         return await self.build_from_text(text, metadata, extract_faq)
     
     def _chunk_text(self, text: str) -> List[str]:
-        """Split text into chunks with overlap.
-        
-        Args:
-            text: The text to split
-            
-        Returns:
-            List of text chunks
         """
-        # Simple character-based chunking
+        将文本划分为带有重叠的块
+        
+        参数:
+            text: 要划分的文本
+            
+        返回:
+            文本块列表
+        """
+        # 简单的基于字符的分块
         chunks = []
         
-        # Trivial case: text is smaller than chunk size
+        # 简单情况：文本小于块大小
         if len(text) <= self.chunk_size:
             chunks.append(text)
             return chunks
             
-        # Split into chunks with overlap
+        # 划分为带有重叠的块
         start = 0
         while start < len(text):
-            # Get chunk end position
+            # 获取块的结束位置
             end = start + self.chunk_size
             
-            # Adjust end to not cut in the middle of a sentence if possible
+            # 调整结束位置，尽量不在句子中间切断
             if end < len(text):
-                # Look for sentence boundaries (period, question mark, exclamation mark)
+                # 查找句子边界(句号、问号、感叹号)
                 sentence_end = max(
                     text.rfind('. ', start, end),
                     text.rfind('? ', start, end),
                     text.rfind('! ', start, end)
                 )
                 
-                # If found a sentence end, use it as chunk end
+                # 如果找到句子结尾，将其作为块的结束
                 if sentence_end > start:
-                    end = sentence_end + 1  # Include the period
+                    end = sentence_end + 1  # 包括句号
             
-            # Add chunk
+            # 添加块
             chunks.append(text[start:min(end, len(text))])
             
-            # Move start position for next chunk, considering overlap
+            # 移动起始位置到下一个块，考虑重叠
             start = end - self.chunk_overlap
             
-            # Ensure progress is made
+            # 确保有进展
             if start >= len(text) or start <= 0:
                 break
                 
         return chunks
         
     async def _extract_faqs(self, text: str) -> List[Dict[str, str]]:
-        """Extract FAQs from text using LLM.
-        
-        Args:
-            text: The text to extract FAQs from
-            
-        Returns:
-            List of extracted FAQs
         """
-        # If text is too long, split it and extract FAQs from each part
+        使用LLM从文本中提取FAQ
+        
+        参数:
+            text: 要提取FAQ的文本
+            
+        返回:
+            提取的FAQ列表
+        """
+        # 如果文本太长，拆分并从每个部分提取FAQ
         if len(text) > 8000:
             chunks = self._chunk_text(text)
             faqs = []
@@ -189,7 +204,7 @@ class KnowledgeBuilder:
                 faqs.extend(chunk_faqs)
             return faqs
             
-        # Prompt template for FAQ extraction
+        # FAQ提取的提示模板
         system_prompt = """你是一位专业的知识提取专家。你的任务是从文本中提取可能的常见问题(FAQ)。这些问题应该是用户可能会问的关于文本内容的自然问题，答案应该能在文本中找到。提取的FAQ应该覆盖文本中最重要的概念和信息。
 
 请遵循以下规则：
@@ -222,17 +237,17 @@ class KnowledgeBuilder:
 请提取最相关、最有价值的FAQ，并按JSON格式返回。"""
 
         try:
-            # Generate FAQs
+            # 生成FAQ
             response = self.llm_client.sync_generate(
                 prompt=user_prompt,
                 system_prompt=system_prompt,
                 temperature=0.2
             )
             
-            # Parse the response as JSON
+            # 将响应解析为JSON
             import json
             try:
-                # Try to find JSON array in the response
+                # 尝试在响应中查找JSON数组
                 start_idx = response.find('[')
                 end_idx = response.rfind(']') + 1
                 
@@ -248,5 +263,5 @@ class KnowledgeBuilder:
                 return []
                 
         except Exception as e:
-            logger.error(f"Error extracting FAQs: {str(e)}")
+            logger.error(f"Failed to extract FAQs: {str(e)}")
             return [] 

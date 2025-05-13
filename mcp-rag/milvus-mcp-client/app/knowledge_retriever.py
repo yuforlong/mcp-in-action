@@ -1,3 +1,13 @@
+"""
+知识检索模块
+功能：实现RAG(检索增强生成)技术与知识库交互
+作用：对用户问题进行拆解、知识检索、内容筛选和回答生成
+主要功能：
+1. 问题拆解：将复杂问题拆解为更简单的子问题
+2. 知识检索：在知识库和FAQ库中检索相关内容
+3. 内容筛选：根据相关性对检索结果进行筛选和排序
+4. 回答生成：基于检索内容使用LLM生成回答
+"""
 import asyncio
 from typing import Dict, List, Any, Optional, Union
 from loguru import logger
@@ -8,13 +18,14 @@ from app.llm_client import LLMClient
 from app.config import MAX_SEARCH_RESULTS
 
 class KnowledgeRetriever:
-    """Knowledge retriever for performing RAG queries against the knowledge base."""
+    """知识检索器，用于对知识库执行RAG查询"""
     
     def __init__(self, max_search_results: int = MAX_SEARCH_RESULTS):
-        """Initialize the knowledge retriever.
+        """
+        初始化知识检索器
         
-        Args:
-            max_search_results: Maximum number of search results to return
+        参数:
+            max_search_results: 返回的最大搜索结果数量
         """
         self.max_search_results = max_search_results
         self.mcp_client = MCPClient()
@@ -22,27 +33,28 @@ class KnowledgeRetriever:
         logger.info(f"Initialized KnowledgeRetriever with max_search_results={max_search_results}")
         
     async def query(self, question: str) -> str:
-        """Query the knowledge base and return an answer.
-        
-        Args:
-            question: The question to answer
-            
-        Returns:
-            The answer to the question
         """
-        # Connect to MCP server if needed
+        查询知识库并返回答案
+        
+        参数:
+            question: 要回答的问题
+            
+        返回:
+            问题的答案
+        """
+        # 如果需要，连接到MCP服务器
         if not hasattr(self.mcp_client, '_connected') or not self.mcp_client._connected:
             await self.mcp_client.connect()
             
-        # Step 1: Rewrite and decompose the question
+        # 步骤1: 重写并分解问题
         sub_questions = await self._decompose_question(question)
         logger.info(f"Decomposed question into {len(sub_questions)} sub-questions")
         
-        # Step 2: Search for relevant content for each sub-question
+        # 步骤2: 为每个子问题搜索相关内容
         all_context = []
         
         for sub_q in sub_questions:
-            # Search knowledge base
+            # 搜索知识库
             try:
                 knowledge_results = await self.mcp_client.search_knowledge(
                     query=sub_q,
@@ -52,7 +64,7 @@ class KnowledgeRetriever:
             except Exception as e:
                 logger.error(f"Error searching knowledge base: {str(e)}")
                 
-            # Search FAQ base
+            # 搜索FAQ库
             try:
                 faq_results = await self.mcp_client.search_faq(
                     query=sub_q,
@@ -62,23 +74,24 @@ class KnowledgeRetriever:
             except Exception as e:
                 logger.error(f"Error searching FAQ base: {str(e)}")
                 
-        # Step 3: Filter and rank the search results
+        # 步骤3: 过滤和排序搜索结果
         filtered_context = await self._filter_context(question, all_context)
         logger.info(f"Filtered {len(all_context)} context items to {len(filtered_context)}")
         
-        # Step 4: Generate answer using filtered context
+        # 步骤4: 使用过滤后的上下文生成答案
         answer = await self._generate_answer(question, filtered_context)
         
         return answer
         
     async def _decompose_question(self, question: str) -> List[str]:
-        """Decompose a complex question into simpler sub-questions.
+        """
+        将复杂问题分解为更简单的子问题
         
-        Args:
-            question: The question to decompose
+        参数:
+            question:, 要分解的问题
             
-        Returns:
-            List of sub-questions
+        返回:
+            子问题列表
         """
         system_prompt = """你是一位问题分析专家。你的任务是将复杂问题分解为更简单的子问题，以便更好地检索相关信息。
 
@@ -103,16 +116,16 @@ class KnowledgeRetriever:
 {question}"""
 
         try:
-            # Generate sub-questions
+            # 生成子问题
             response = self.llm_client.sync_generate(
                 prompt=user_prompt,
                 system_prompt=system_prompt,
                 temperature=0.3
             )
             
-            # Parse the response as JSON
+            # 将响应解析为JSON
             try:
-                # Try to find JSON array in the response
+                # 尝试在响应中查找JSON数组
                 start_idx = response.find('[')
                 end_idx = response.rfind(']') + 1
                 
@@ -132,24 +145,25 @@ class KnowledgeRetriever:
             return [question]
             
     async def _filter_context(self, question: str, context_items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Filter context items based on relevance to the question.
-        
-        Args:
-            question: The original question
-            context_items: List of context items from search
-            
-        Returns:
-            Filtered list of context items
         """
-        # Simple filtering: deduplication and truncation
+        根据与问题的相关性过滤上下文项
+        
+        参数:
+            question: 原始问题
+            context_items: 搜索得到的上下文项列表
+            
+        返回:
+            过滤后的上下文项列表
+        """
+        # 简单过滤：去重和截断
         seen_contents = set()
         filtered_items = []
         
-        # Prioritize FAQ types
+        # 优先处理FAQ类型
         faq_items = [item for item in context_items if item["type"] == "faq"]
         knowledge_items = [item for item in context_items if item["type"] == "knowledge"]
         
-        # Process FAQs first
+        # 首先处理FAQ
         for item in faq_items:
             content_key = None
             if item["type"] == "faq":
@@ -160,38 +174,39 @@ class KnowledgeRetriever:
                 seen_contents.add(content_key)
                 filtered_items.append(item)
         
-        # Then process knowledge items
+        # 然后处理知识库项
         for item in knowledge_items:
             content_key = None
             if item["type"] == "knowledge":
                 content = item["content"]
-                content_key = f"knowledge:{content['content'][:100]}"  # Use first 100 chars as key
+                content_key = f"knowledge:{content['content'][:100]}"  # 使用前100个字符作为键
             
             if content_key and content_key not in seen_contents:
                 seen_contents.add(content_key)
                 filtered_items.append(item)
         
-        # Limit the total number of context items
-        max_context_items = 6  # Adjusted based on context capacity
+        # 限制上下文项的总数
+        max_context_items = 6  # 根据上下文容量调整
         if len(filtered_items) > max_context_items:
             filtered_items = filtered_items[:max_context_items]
             
         return filtered_items
         
     async def _generate_answer(self, question: str, context_items: List[Dict[str, Any]]) -> str:
-        """Generate an answer based on the question and context.
-        
-        Args:
-            question: The original question
-            context_items: Filtered context items
-            
-        Returns:
-            The generated answer
         """
-        # Prepare context text
+        基于问题和上下文生成答案
+        
+        参数:
+            question: 原始问题
+            context_items: 过滤后的上下文项
+            
+        返回:
+            生成的答案
+        """
+        # 准备上下文文本
         context_text = ""
         
-        # Add knowledge contents
+        # 添加知识库内容
         knowledge_items = [item for item in context_items if item["type"] == "knowledge"]
         if knowledge_items:
             context_text += "【知识库内容】\n"
@@ -199,7 +214,7 @@ class KnowledgeRetriever:
                 content = item["content"]["content"]
                 context_text += f"{i}. {content}\n\n"
                 
-        # Add FAQ contents
+        # 添加FAQ内容
         faq_items = [item for item in context_items if item["type"] == "faq"]
         if faq_items:
             context_text += "【FAQ内容】\n"
@@ -208,11 +223,11 @@ class KnowledgeRetriever:
                 answer = item["content"]["answer"]
                 context_text += f"{i}. 问: {question}\n   答: {answer}\n\n"
                 
-        # If no context was found
+        # 如果没有找到上下文
         if not context_text:
             return "抱歉，我没有找到与您问题相关的信息。请尝试用不同的方式提问，或者提供更多的上下文信息。"
             
-        # Prepare system prompt
+        # 准备系统提示
         system_prompt = """你是一个专业的问答助手。你的任务是基于提供的上下文信息，回答用户的问题。请遵循以下规则：
 
 1. 仔细阅读上下文中提供的所有信息。
@@ -231,7 +246,7 @@ class KnowledgeRetriever:
 问题：{question}"""
 
         try:
-            # Generate answer
+            # 生成答案
             response = self.llm_client.sync_generate(
                 prompt=user_prompt,
                 system_prompt=system_prompt,

@@ -1,3 +1,12 @@
+"""
+LLM 客户端模块
+功能：提供与大型语言模型(LLM)的交互接口
+作用：使用OpenAI兼容API调用LLM模型，用于生成文本、问题拆解和FAQ提取
+主要功能：
+1. 异步和同步调用LLM模型生成文本
+2. 支持工具调用功能(Function Calling)
+3. 处理模型响应并转换为适当的数据结构
+"""
 import json
 from typing import Dict, List, Any, Optional, Union
 from loguru import logger
@@ -7,19 +16,20 @@ from openai import OpenAI, AsyncOpenAI
 from app.config import OPENAI_API_KEY, OPENAI_API_BASE, OPENAI_MODEL
 
 class LLMClient:
-    """Client for interacting with LLM models via OpenAI API."""
+    """通过OpenAI API与LLM模型交互的客户端"""
     
     def __init__(self, model: str = OPENAI_MODEL):
-        """Initialize the LLM client.
+        """
+        初始化LLM客户端
         
-        Args:
-            model: The model name to use
+        参数:
+            model: 要使用的模型名称
         """
         self.model = model
         self.api_key = OPENAI_API_KEY
         self.api_base = OPENAI_API_BASE
         
-        # Initialize sync and async clients
+        # 初始化同步和异步客户端
         self.client = OpenAI(
             api_key=self.api_key,
             base_url=self.api_base if self.api_base else None
@@ -39,29 +49,30 @@ class LLMClient:
         max_tokens: int = 1500,
         tools: Optional[List[Dict[str, Any]]] = None
     ) -> Dict[str, Any]:
-        """Generate a response from the LLM model using the OpenAI API.
+        """
+        使用OpenAI API从LLM模型生成响应
         
-        Args:
-            messages: List of message objects with role and content
-            temperature: The sampling temperature to use
-            max_tokens: The maximum number of tokens to generate
-            tools: Optional list of tools to provide to the model
+        参数:
+            messages: 包含角色和内容的消息对象列表
+            temperature: 采样温度
+            max_tokens: 生成的最大token数量
+            tools: 提供给模型的可选工具列表
             
-        Returns:
-            The response from the model
+        返回:
+            模型的响应结果
         """
         try:
-            # Log the request (excluding sensitive information)
+            # 记录请求信息(不包括敏感信息)
             debug_messages = [f"{m['role']}: <content>" for m in messages]
             logger.debug(f"Sending request to LLM API with {len(messages)} messages: {debug_messages}")
             
-            # Prepare additional parameters if tools are provided
+            # 如果提供了工具，准备额外参数
             kwargs = {}
             if tools:
                 kwargs["tools"] = tools
                 kwargs["tool_choice"] = "auto"
             
-            # Send the request using the async client
+            # 使用异步客户端发送请求
             response = await self.async_client.chat.completions.create(
                 model=self.model,
                 messages=messages,
@@ -70,7 +81,7 @@ class LLMClient:
                 **kwargs
             )
             
-            # Convert the response object to a dictionary
+            # 将响应对象转换为字典
             response_dict = {
                 "id": response.id,
                 "object": "chat.completion",
@@ -89,7 +100,7 @@ class LLMClient:
                 ]
             }
             
-            # Add tool_calls if present
+            # 如果存在工具调用，添加工具调用信息
             if hasattr(response.choices[0].message, "tool_calls") and response.choices[0].message.tool_calls:
                 response_dict["choices"][0]["message"]["tool_calls"] = [
                     {
@@ -116,34 +127,35 @@ class LLMClient:
         system_prompt: Optional[str] = None,
         temperature: float = 0.7
     ) -> str:
-        """Synchronous generation for simpler use cases.
+        """
+        用于简单使用场景的同步生成方法
         
-        Args:
-            prompt: The user prompt
-            system_prompt: Optional system prompt
-            temperature: The sampling temperature
+        参数:
+            prompt: 用户提示
+            system_prompt: 可选的系统提示
+            temperature: 采样温度
             
-        Returns:
-            The generated text response
+        返回:
+            生成的文本响应
         """
         try:
             messages = []
             
-            # Add system message if provided
+            # 如果提供了系统提示，添加系统消息
             if system_prompt:
                 messages.append({"role": "system", "content": system_prompt})
                 
-            # Add user message
+            # 添加用户消息
             messages.append({"role": "user", "content": prompt})
             
-            # Call the model using the sync client
+            # 使用同步客户端调用模型
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
                 temperature=temperature
             )
             
-            # Return the content of the first choice's message
+            # 返回第一个选择项消息的内容
             return response.choices[0].message.content
                 
         except Exception as e:
