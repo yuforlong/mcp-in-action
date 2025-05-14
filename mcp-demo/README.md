@@ -38,7 +38,7 @@ MCP 是一种开放协议，允许大语言模型（如 Claude）与外部系统
 ### 项目结构
 
 ```
-mcp_demo/
+mcp-demo/
 │
 ├── server/                    # 服务器实现
 │   └── weather_server.py      # 天气信息服务器
@@ -142,14 +142,14 @@ mcp_demo/
 
 ```bash
 git clone https://github.com/your-username/mcp-in-action.git
-cd mcp-in-action/mcp_demo
+cd mcp-in-action/mcp-demo
 ```
 
 2. **创建并激活虚拟环境**：
 
 ```bash
-python -m venv venv_mcp_demo
-source venv_mcp_demo/bin/activate
+python -m venv venv_mcp-demo
+source venv_mcp-demo/bin/activate
 ```
 
 3. **安装依赖**：
@@ -209,7 +209,7 @@ python client/mcp_client.py
 ```
 #### 调用示例
 ```bash
-(venv_mcp_demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp_demo# python client/mcp_client.py
+(venv_mcp-demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-demo# python client/mcp_client.py
 启动 MCP 服务器进程...
 已连接到服务器，可用工具: 2
   - get_weather_warning: 
@@ -314,7 +314,7 @@ python client/mcp_client_deepseek.py
 **智能助手**：
 
 ```bash
-(venv_mcp_demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp_demo# python client/mcp_client_deepseek.py
+(venv_mcp-demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-demo# python client/mcp_client_deepseek.py
 2025-05-03 14:25:12,273 - INFO - 成功连接到 MCP 服务器
 2025-05-03 14:25:12,273 - INFO - 开始聊天会话...
 
@@ -351,7 +351,7 @@ python client/mcp_client_deepseek.py
 
 **智能助手**：
 ```bash
-(venv_mcp_demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp_demo# python client/mcp_client_deepseek.py 
+(venv_mcp-demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-demo# python client/mcp_client_deepseek.py 
 2025-05-03 15:03:51,662 - INFO - 成功连接到 MCP 服务器
 2025-05-03 15:03:51,662 - INFO - 开始聊天会话...
 

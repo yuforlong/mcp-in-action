@@ -22,10 +22,10 @@ MCP In Action 是一个实战项目，旨在帮助开发者快速掌握 Model Co
 
 本仓库包含以下主要项目：
 
-### 项目1：[mcp_opensource](https://github.com/FlyAIBox/mcp-in-action/tree/main/mcp_opensource)
+### 项目1：[mcp-opensource](https://github.com/FlyAIBox/mcp-in-action/tree/main/mcp-opensource)
 这个项目展示了 MCP 的开源工具，平台等。
 
-### 项目2：[mcp_demo](https://github.com/FlyAIBox/mcp-in-action/tree/main/mcp_demo)
+### 项目2：[mcp-demo](https://github.com/FlyAIBox/mcp-in-action/tree/main/mcp-demo)
 
 这个项目展示了 MCP 的基础应用，通过搭建客户端-服务器架构，让 AI 模型能够访问实时天气信息。
 
@@ -45,7 +45,7 @@ MCP In Action 是一个实战项目，旨在帮助开发者快速掌握 Model Co
 - **LangChain 集成**：在 LangChain 框架中使用 MCP 服务器
 - **云端部署**：将 MCP 服务部署到云端(阿里云/mcp.so)
 
-### 项目3：[mcp_rag](https://github.com/FlyAIBox/mcp-in-action/tree/main/mcp_rag)
+### 项目3：[mcp_rag](https://github.com/FlyAIBox/mcp-in-action/tree/main/mcp-rag)
 
 这个项目专注于将 MCP 与检索增强生成 (RAG) 技术结合，展示如何通过 MCP 实现更高级的知识检索和信息整合能力。
 
@@ -70,7 +70,7 @@ MCP In Action 是一个实战项目，旨在帮助开发者快速掌握 Model Co
 
 ```
 mcp-in-action/
-├── mcp_demo/              # 基础 MCP 示例项目
+├── mcp-demo/              # 基础 MCP 示例项目
 │   ├── server.py          # MCP 服务器实现
 │   ├── client.py          # MCP 客户端示例
 │   ├── tools/             # 工具集合
