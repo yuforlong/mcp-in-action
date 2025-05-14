@@ -28,9 +28,9 @@ if [[ "$(printf '%s\n' "$required_version" "$python_version" | sort -V | head -n
 fi
 
 # 检查虚拟环境
-if [[ ! -d "venv_mcp_demo" ]]; then
+if [[ ! -d "venv_mcp-demo" ]]; then
     echo -e "${BLUE}创建虚拟环境...${NC}"
-    python3 -m venv venv_mcp_demo
+    python3 -m venv venv_mcp-demo
     if [[ $? -ne 0 ]]; then
         echo -e "${RED}创建虚拟环境失败${NC}"
         exit 1
@@ -40,7 +40,7 @@ fi
 
 # 激活虚拟环境
 echo -e "${BLUE}激活虚拟环境...${NC}"
-source venv_mcp_demo/bin/activate
+source venv_mcp-demo/bin/activate
 if [[ $? -ne 0 ]]; then
     echo -e "${RED}激活虚拟环境失败${NC}"
     exit 1
