@@ -1,0 +1,101 @@
+# Milvus 向量数据库及其依赖服务的 Docker Compose 配置文件
+# 服务器配置：4核CPU，8GB内存
+version: '3.5'
+
+services:
+  # etcd 服务 - 用于存储 Milvus 的元数据
+  etcd:
+    container_name: milvus-etcd
+    image: quay.io/coreos/etcd:v3.5.5
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision    # 自动压缩模式设置为 revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000   # 保留最近 1000 个版本
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296   # 后端存储配额限制为 4GB
+      - ETCD_SNAPSHOT_COUNT=50000             # 每 50000 次事务创建一次快照
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/etcd:/etcd    # 数据持久化存储
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'        # CPU 限制为 0.5 核
+          memory: 512M       # 内存限制为 512MB
+        reservations:
+          memory: 256M       # 预留 256MB 内存
+
+  # MinIO 服务 - 用于存储 Milvus 的向量数据
+  minio:
+    container_name: milvus-minio
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    environment:
+      MINIO_ACCESS_KEY: minioadmin      # MinIO 访问密钥
+      MINIO_SECRET_KEY: minioadmin      # MinIO 密钥
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/minio:/minio_data    # 数据持久化存储
+    command: minio server /minio_data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'        # CPU 限制为 0.5 核
+          memory: 512M       # 内存限制为 512MB
+        reservations:
+          memory: 256M       # 预留 256MB 内存
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s          # 每 30 秒检查一次
+      timeout: 20s          # 超时时间为 20 秒
+      retries: 3            # 重试 3 次
+
+  # Milvus 单机版服务
+  standalone:
+    container_name: milvus-standalone
+    image: milvusdb/milvus:v2.3.3
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_ENDPOINTS: etcd:2379           # etcd 服务地址
+      MINIO_ADDRESS: minio:9000           # MinIO 服务地址
+      COMMON_SECURITY_MODE: 0             # 安全模式关闭
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/milvus:/var/lib/milvus    # 数据持久化存储
+    ports:
+      - "19530:19530"    # Milvus 服务端口
+      - "9091:9091"      # 监控端口
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'        # CPU 限制为 0.5 核
+          memory: 512M       # 内存限制为 512MB
+        reservations:
+          memory: 256M       # 预留 256MB 内存
+    depends_on:
+      - "etcd"
+      - "minio"
+
+  # MCP 服务器 - 向量检索应用服务
+  mcp-server:
+    container_name: milvus-mcp-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - MILVUS_HOST=standalone           # Milvus 服务地址
+      - MILVUS_PORT=19530                # Milvus 服务端口
+      - EMBEDDING_MODEL=all-MiniLM-L6-v2 # 文本向量化模型
+      - VECTOR_DIMENSION=384             # 向量维度
+      - KNOWLEDGE_COLLECTION=knowledge_store  # 知识库集合名称
+      - FAQ_COLLECTION=faq_store         # FAQ 集合名称
+      - LOG_LEVEL=INFO                   # 日志级别
+      - PORT=8080                        # 服务端口
+      - OMP_NUM_THREADS=1                # OpenMP 线程数降低为1
+      - TOKENIZERS_PARALLELISM=false     # 关闭分词器并行处理
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'        # CPU 限制为 0.5 核
+          memory: 512M       # 内存限制为 512MB
+        reservations:
+          memory: 256M       # 预留 256MB 内存
+    ports:
+      - "8080:8080"         # 对外服务端口
+    depends_on:
+      - "standalone"         # 依赖 Milvus 服务 

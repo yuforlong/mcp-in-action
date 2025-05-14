@@ -1,0 +1,7 @@
+mcp==1.5.0
+dashscope==1.22.2
+openai==1.76.0
+markdown-it-py==3.0.0
+markdownify==1.1.0
+pdfplumber==0.11.6
+comtypes==1.4.10

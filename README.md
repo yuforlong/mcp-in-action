@@ -15,7 +15,7 @@ MCP In Action 是一个实战项目，旨在帮助开发者快速掌握 Model Co
 ## 文档
 1. [MCP实战入门：让AI模型获取实时天气信息](https://mp.weixin.qq.com/s/cJhHf7caaezehEff2GSY_A)
 2. [MCP实战进阶：集成DeepSeek模型与MCP的天气信息助手](https://mp.weixin.qq.com/s/1YIYRVw8yF1zeeLtmnhtYQ)
-3. [MCP实战高阶：借助LangChain打造智能天气助手]()
+3. [MCP实战高阶：借助LangChain快速打造MCP天气助手](https://mp.weixin.qq.com/s/Qq3C85Bi3NHDQ9MnnBZvZQ)
 
 ## 项目架构
 
