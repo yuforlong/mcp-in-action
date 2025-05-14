@@ -45,95 +45,68 @@ MCP In Action 是一个实战项目，旨在帮助开发者快速掌握 Model Co
 - **LangChain 集成**：在 LangChain 框架中使用 MCP 服务器
 - **云端部署**：将 MCP 服务部署到云端(阿里云/mcp.so)
 
-### 项目3：[mcp_rag](https://github.com/FlyAIBox/mcp-in-action/tree/main/mcp-rag)
+### 项目3：[mcp-rag](https://github.com/FlyAIBox/mcp-in-action/tree/main/mcp-rag)
 
 这个项目专注于将 MCP 与检索增强生成 (RAG) 技术结合，展示如何通过 MCP 实现更高级的知识检索和信息整合能力。
+#### 项目目标
 
+本项目旨在**构建一个基于MCP的企业RAG系统**，实现以下具体目标：
 
-## MCP 开发指南
+1. **技术目标**
+   - 构建支持MCP协议的知识库服务和客户端
+   - 实现文档智能切分、FAQ自动提取功能
+   - 支持复杂问题的拆解和混合检索策略
+2. **应用目标**
+   - 提供统一的知识库管理和检索入口
+   - 显著提升企业内部知识检索准确率(目标90%以上)
+   - 减少70%知识库维护工作量
+   - 支持企业各类文档的智能处理和检索
 
-### MCP 服务器开发流程
+#### 项目系统设计与实现
 
-1. **定义工具接口**：明确工具的功能和参数
-2. **实现 MCP 协议**：遵循 MCP 规范实现请求响应机制
-3. **配置运行环境**：设置服务器监听和处理机制
-4. **测试与调试**：验证服务器功能正常
+> 本项目系统设计参考自[alibabacloud-tablestore-mcp-server](https://github.com/aliyun/alibabacloud-tablestore-mcp-server)，由于`alibabacloud-tablestore-mcp-server`项目使用Tablestore存储和Java实现的MCP Server，不方便于后期扩展和迭代。
+>
+> 本项目改造为Milvus存储和Python实现MCP Server和MCP  Client，代码全部重写（cursor帮忙不少）。
+>
+> 以下设计和流程皆为`alibabacloud-tablestore-mcp-server`内容，在此感谢@xjtushilei 开源的`alibabacloud-tablestore-mcp-server`。
 
-### MCP 客户端开发流程
+我们构建的基于MCP的RAG系统主要包含三个核心部分：
 
-1. **建立连接**：实现与 MCP 服务器的通信
-2. **构造请求**：按照 MCP 规范创建请求
-3. **处理响应**：解析和处理 MCP 服务器返回的数据
-4. **错误处理**：实现健壮的错误处理机制
+1. **知识库服务(MCP Server)**：基于Milvus向量数据库实现的后端服务，负责文档存储和检索
+2. **客户端工具(MCP Client)**：与MCP Server通信的客户端，实现知识库的构建和检索功能
+3. **大模型集成**：通过LLM实现文档切分、FAQ提取、问题拆解和回答生成等核心功能
 
-## 项目结构
+![流程图](https://github.com/FlyAIBox/mcp-in-action/raw/rag_0.1.1/mcp-rag/doc/img/1.png)
 
-```
-mcp-in-action/
-├── mcp-demo/              # 基础 MCP 示例项目
-│   ├── server.py          # MCP 服务器实现
-│   ├── client.py          # MCP 客户端示例
-│   ├── tools/             # 工具集合
-│   │   ├── weather.py     # 天气查询工具
-│   │   └── ...
-│   ├── utils/             # 工具函数
-│   └── configs/           # 配置文件
-├── mcp_rag/               # MCP RAG 项目
-│   ├── server.py          # RAG 服务器实现
-│   ├── client.py          # RAG 客户端
-│   ├── indexer/           # 索引构建器
-│   └── retriever/         # 检索实现
-└── README.md              # 项目文档
-```
+主要分为两部分：知识库构建和检索。
 
-## 核心概念
+1. **知识库构建**
+   1. **文本切段：** 对文本进行切段，切段后的内容需要保证文本完整性以及语义完整性。
+   2. **提取 FAQ：** 根据文本内容提取 FAQ，作为知识库检索的一个补充，以提升检索效果。
+   3. **导入知识库：** 将文本和 FAQ 导入知识库，并进行 Embedding 后导入向量。
+2. **知识检索（RAG）**
+   1. **问题拆解：** 对输入问题进行拆解和重写，拆解为更原子的子问题。
+   2. 检索：针对每个子问题分别检索相关文本和 FAQ，针对文本采取向量检索，针对 FAQ 采取全文和向量混合检索。
+   3. **知识库内容筛选：** 针对检索出来的内容进行筛选，保留与问题最相关的内容进行参考回答。
 
-### Model Context Protocol (MCP)
+相比传统的 Naive RAG，在知识库构建和检索分别做了一些常见的优化，包括 Chunk 切分优化、提取 FAQ、Query Rewrite、混合检索等。
 
-MCP 是一个允许大语言模型与外部工具和服务进行通信的协议。它定义了模型与外部系统之间的标准化接口，使模型能够：
+##### 流程
 
-- 调用外部 API 和服务
-- 获取实时数据
-- 执行特定的功能和计算
-- 返回结构化的响应
+![流程图](https://cdn.jsdelivr.net/gh/FlyAIBox/note-picture@main/imag/202505141042986.png)
 
-### MCP 的优势
+本Agent整体架构分为三个部分：
 
-- **能力扩展**：让模型具备超越其训练数据的能力
-- **实时性**：访问最新的信息和数据
-- **专业工具集成**：与已有的专业工具和服务整合
-- **标准化**：提供统一的接口标准
-- **安全性**：可控的权限和访问管理
+1. **知识库：**内部包含 Knowledge Store 和 FAQ Store，分别存储文本内容和 FAQ 内容，支持向量和全文的混合检索。
+2. **MCP Server：**提供对 Knowledge Store 和 FAQ Store 的读写操作，总共提供 4 个 Tools。
+3. **功能实现部分：**完全通过 Prompt + LLM 来实现对知识库的导入、检索和问答这几个功能。
 
-## 最佳实践
+#### 项目结构
 
-### 服务器设计
+项目结构分为两部分：
 
-- 实现健壮的错误处理
-- 添加详细的日志记录
-- 设计合理的超时机制
-- 考虑并发请求处理
-
-### 客户端实现
-
-- 优化请求批处理
-- 实现重试机制
-- 缓存常用请求结果
-- 处理不同类型的响应
-
-### 安全性考虑
-
-- 实现身份验证和授权
-- 限制资源使用
-- 监控异常请求
-- 敏感数据处理
-
-## 高级应用场景
-
-- **定制化助手**：结合专有数据和工具创建行业特定的 AI 助手
-- **知识库增强**：通过 RAG 实现动态知识更新和检索
-- **多模态交互**：集成图像处理、音频分析等多模态能力
-- **自动化工作流**：构建基于 MCP 的自动化业务流程
+1. **`milvus-mcp-client`：**Python 实现的 Client 端，实现了与大模型进行交互，通过 MCP Client 获取 Tools，根据大模型的反馈调用 Tools 等基本能力。通过 Prompt 实现了知识库构建、检索和问答三个主要功能。
+2. `milvus-mcp-server`：Python 实现的 Server 端，基于 MCP 框架实现的服务，提供了连接 Milvus 向量数据库的接口，支持知识库的存储和检索功能。
 
 ## 贡献指南
 
