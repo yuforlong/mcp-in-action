@@ -415,6 +415,47 @@ python client/mcp_client_deepseek.py
 功能基本同方法三
 主要是： 借助LangChain一个新的开源项目 `langchain-mcp-adapters`，将MCP服务器集成到 LangChain中
 
+LangChain版本相比原生DeepSeek版本在MCP开发中的主要优势：
+
+1. **更简洁的代理创建流程**：LangChain版本使用`create_react_agent`函数直接创建代理，简化了代码复杂度：
+   ```python
+   agent = create_react_agent(
+       model=self.llm_client,  
+       tools=tools,
+       prompt=prompt
+   )
+   ```
+   而DeepSeek直接实现需要手动处理整个工具调用循环。
+
+2. **自动化的工具处理**：LangChain版本使用`load_mcp_tools`函数自动适配MCP工具，省去了工具格式转换的工作：
+   ```python
+   tools = await load_mcp_tools(self.session)
+   ```
+   对比DeepSeek版本需要手动将MCP工具转换为OpenAI格式：
+   ```python
+   available_tools = [tool.to_openai_format() for tool in tools]
+   ```
+
+3. **内置的ReAct推理能力**：LangChain版本利用了该框架的ReAct代理能力，可以自动执行"思考-行动-观察"循环，而无需手动管理对话历史和工具调用次数。
+
+4. **简化的消息管理**：LangChain处理模型消息和工具调用结果的逻辑更加抽象化，不需要手动构建完整的消息历史。DeepSeek版本需要手动管理消息传递和工具调用的过程。
+
+5. **扩展性更好**：LangChain提供了标准化的工具接口，可以更容易地扩展到其他模型或添加新工具，同时保持代码结构一致。
+
+6. **减少错误处理负担**：LangChain内置了更多的错误处理机制，而DeepSeek版本需要开发者手动实现各种错误处理代码。
+
+7. **更精简的执行循环**：DeepSeek版本需要手动实现多轮工具调用循环(max_tool_turns)，而LangChain版本通过代理自动处理这一过程。
+
+8. **结果展示更丰富**：LangChain版本会自动记录并可视化工具调用过程和结果，方便调试和优化：
+   ```python
+   for message in agent_response['messages']:
+       print(f"\nTool: {message.name}")
+       print(f"Content:\n{message.content}")
+   ```
+
+总结来说，使用LangChain框架开发MCP客户端的主要优势在于：代码更简洁、抽象层次更高、工具处理更自动化、扩展性更好，并且减少了开发者需要手动管理的复杂逻辑，特别是在多轮工具调用和消息处理方面。
+
+
 在运行客户端之前，需要配置以下环境变量。修改名为 `.env` 的文件：
 
 ```dotenv
