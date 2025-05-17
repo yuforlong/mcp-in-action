@@ -34,7 +34,8 @@ MCP In Action 是一个实战项目，旨在帮助开发者快速掌握 Model Co
 - **MCP 服务器开发**：从零构建符合 MCP 规范的服务器
 - **MCP 服务器调试**：提供调试方法和最佳实践
 - **MCP 客户端开发**：实现与服务器通信的客户端
-- **生命周期管理**：控制 MCP 服务的完整生命周期
+- **DeepSeek集成**：MCP客户端集成DeepSeek大模型
+- **LangChain 集成**：在 LangChain 框架中使用 MCP 服务器
 
 #### MCP Server 进阶
 - **Desktop 加载**：将 MCP 服务集成到桌面应用程序
