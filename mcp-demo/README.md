@@ -43,12 +43,13 @@ mcp-demo/
 ├── server/                    # 服务器实现
 │   └── weather_server.py      # 天气信息服务器
 │
-├── client/                    # 客户端实现
-│   └── mcp_client.py          # MCP 客户端
-│   └── mcp_client_deepseek.py # DeepSeek MCP 客户端（支持对话）
+├── client/                          # 客户端实现
+│   └── mcp_client.py                # MCP 客户端
+│   └── mcp_client_deepseek.py       # DeepSeek MCP 客户端（支持对话）
+│   └── mcp_client_langchain.py      # 基于LangChain实现 MCP 客户端
+│   └── mcp_client_langchain_chat.py # 基于LangChain实现 MCP 客户端（支持多轮对话）
 │
 ├── requirements.txt           # 项目依赖
-├── run.sh                     # 运行脚本
 └── README.md                  # 项目文档
 ```
 
@@ -110,7 +111,7 @@ mcp-demo/
   ![和风天气API Host](./doc/img/qweather02.png) 
 
 4. **API 使用说明**：
-   - 免费版API有调用次数限制，详情请参考[和风天气定价页面](https://dev.qweather.com/docs/pricing/)
+   - 免费版API有调用次数限制，详情请参考[和风天气定价页面](https://dev.qweather.com/price/)
    - 支持通过城市ID或经纬度坐标查询天气信息
    - 城市ID可通过[和风天气城市查询API](https://dev.qweather.com/docs/api/geoapi/)获取
 
@@ -127,14 +128,14 @@ mcp-demo/
 ## 文档
 1. [MCP实战入门：让AI模型获取实时天气信息](https://mp.weixin.qq.com/s/cJhHf7caaezehEff2GSY_A)
 2. [MCP实战进阶：集成DeepSeek模型与MCP的天气信息助手](https://mp.weixin.qq.com/s/1YIYRVw8yF1zeeLtmnhtYQ)
-3. [MCP实战高阶：借助LangChain打造智能天气助手]()
+3. [MCP实战高阶：借助LangChain快速打造MCP天气助手](https://mp.weixin.qq.com/s/Qq3C85Bi3NHDQ9MnnBZvZQ)
 
 ## 部署说明
 
 ### 环境要求
 
 - Python 3.10.12 或更高版本
-- Ubuntu 22.04 操作系统（也可在其他 Linux 发行版上运行）
+- Ubuntu 22.04 操作系统
 
 ### 安装步骤
 
@@ -148,8 +149,12 @@ cd mcp-in-action/mcp-demo
 2. **创建并激活虚拟环境**：
 
 ```bash
-python -m venv venv_mcp-demo
-source venv_mcp-demo/bin/activate
+python -m venv venv_mcp_demo
+source venv_mcp_demo/bin/activate
+
+#或者使用conda创建虚拟环境
+conda create -n venv_mcp_demo python=3.10.12
+conda activate venv_mcp_demo
 ```
 
 3. **安装依赖**：
@@ -209,7 +214,7 @@ python client/mcp_client.py
 ```
 #### 调用示例
 ```bash
-(venv_mcp-demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-demo# python client/mcp_client.py
+(venv_mcp_demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-demo# python client/mcp_client.py
 启动 MCP 服务器进程...
 已连接到服务器，可用工具: 2
   - get_weather_warning: 
@@ -314,7 +319,7 @@ python client/mcp_client_deepseek.py
 **智能助手**：
 
 ```bash
-(venv_mcp-demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-demo# python client/mcp_client_deepseek.py
+(venv_mcp_demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-demo# python client/mcp_client_deepseek.py
 2025-05-03 14:25:12,273 - INFO - 成功连接到 MCP 服务器
 2025-05-03 14:25:12,273 - INFO - 开始聊天会话...
 
@@ -351,7 +356,7 @@ python client/mcp_client_deepseek.py
 
 **智能助手**：
 ```bash
-(venv_mcp-demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-demo# python client/mcp_client_deepseek.py 
+(venv_mcp_demo) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-demo# python client/mcp_client_deepseek.py 
 2025-05-03 15:03:51,662 - INFO - 成功连接到 MCP 服务器
 2025-05-03 15:03:51,662 - INFO - 开始聊天会话...
 
