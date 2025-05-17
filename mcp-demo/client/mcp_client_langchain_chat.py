@@ -126,6 +126,10 @@ class MCPServer:
         if not self.session:
             raise RuntimeError("服务器未初始化")
         # LangChain方式获取可用工具列表
+
+        # 自动化的工具处理：
+        # LangChain版本使用load_mcp_tools函数
+        # 自动适配MCP工具，省去了工具格式转换的工作
         tools = await load_mcp_tools(self.session)
         logger.info(f"成功加载工具: {[tool.name for tool in tools]}")
         return tools
@@ -214,6 +218,11 @@ class MCPClient:
         ## 列举工具
         tools = await self.server.list_tools()
 
+        ## 更简洁的代理创建流程：
+        # LangChain版本使用create_react_agent函数
+        # 直接创建代理，并指定模型、工具和提示
+        # 简化了代码复杂度
+        
         # LangChain方式创建和运行agent
         logger.info("正在创建agent...")
         agent = create_react_agent(
