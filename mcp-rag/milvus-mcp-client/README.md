@@ -34,7 +34,7 @@ pip install -r requirements.txt
 ```
 
 3. 配置环境变量：
-创建 `.env` 文件，添加以下配置：
+复制`.env.example`来创建 `.env` 文件并添加以下配置：
 ```
 # MCP服务器配置
 MCP_SERVER_URL=http://localhost:8080/sse
@@ -90,7 +90,7 @@ Milvus MCP Client 使用指南
 
 #### 构建知识库
 ```bash
-(env-mcp-rag) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-rag/milvus-mcp-client#  python -m app.main build --file test.md --title "RAG基本介绍" --author "萤火AI百宝箱" --tags "LLM,RAG,知识库"
+(venv_mcp_rag) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-rag/milvus-mcp-client#  python -m app.main build --file test.md --title "RAG基本介绍" --author "萤火AI百宝箱" --tags "LLM,RAG,知识库"
 2025-05-12 14:50:15 | INFO     | app.mcp_client:__init__:25 - Initialized MCP client with server URL: http://localhost:8080/sse
 2025-05-12 14:50:16 | INFO     | app.llm_client:__init__:33 - Initialized LLM client with model: qwen3-32b
 2025-05-12 14:50:16 | INFO     | app.knowledge_builder:__init__:28 - Initialized KnowledgeBuilder with chunk_size=1000, chunk_overlap=200
@@ -126,7 +126,7 @@ Milvus MCP Client 使用指南
 
 #### 查询知识库
 ```bash
-(env-mcp-rag) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-rag/milvus-mcp-client# python -m app.main query --question "RAG相比企业传统的知识库有什么优势和缺点"
+(venv_mcp_rag) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-rag/milvus-mcp-client# python -m app.main query --question "RAG相比企业传统的知识库有什么优势和缺点"
 2025-05-12 15:01:38 | INFO     | app.mcp_client:__init__:25 - Initialized MCP client with server URL: http://localhost:8080/sse
 2025-05-12 15:01:39 | INFO     | app.llm_client:__init__:33 - Initialized LLM client with model: qwen3-32b
 2025-05-12 15:01:39 | INFO     | app.knowledge_retriever:__init__:22 - Initialized KnowledgeRetriever with max_search_results=5

@@ -15,7 +15,7 @@
 
 ## 部署方式
 
-### 方式一：使用 Docker Compose（推荐）
+### 方式一：使用 Docker Compose
 
 这是最简单的部署方式，所有组件（包括 Milvus、MinIO、etcd 和 MCP 服务器）都会自动配置和启动。
 
@@ -65,17 +65,22 @@ docker compose up -d etcd minio standalone
 ```bash
 # 在mcp-rag目录创建
 cd ..
-python -m venv env-mcp-rag
-source env-mcp-rag/bin/activate  
+python -m venv venv_mcp_rag
+source venv_mcp_rag/bin/activate  
+
+#或者使用conda创建虚拟环境
+conda create -n venv_mcp_rag python=3.10.12
+conda activate venv_mcp_rag
 ```
 
 3. 安装依赖：
 ```bash
+pip install torch==2.7.0 --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements.txt
 ```
 
 4. 配置环境变量：
-创建 `.env` 文件并添加以下配置：
+复制`.env.example`来创建 `.env` 文件并添加以下配置：
 ```
 MILVUS_HOST=localhost
 MILVUS_PORT=19530
@@ -91,7 +96,7 @@ python -m app.main
 ```
 启动成功信息
 ```bash
-(env-mcp-rag) root@fly:~/AI-Box/code/rag/flyaibox-mcp-rag/milvus-mcp-server# python -m app.main
+(venv_mcp_rag) root@fly:~/AI-Box/code/rag/flyaibox-mcp-rag/milvus-mcp-server# python -m app.main
 2025-04-26 23:14:00 | INFO     | __main__:<module>:18 - Starting Milvus MCP Server on port 8080
 INFO:     Started server process [13541]
 INFO:     Waiting for application startup.
@@ -102,7 +107,7 @@ INFO:     192.168.172.1:13398 - "GET / HTTP/1.1" 404 Not Found
 INFO:     192.168.172.1:13398 - "GET /sse HTTP/1.1" 200 OK
 ```
 6. 验证服务器是否启动成功：
-http://192.168.172.128:8080/sse
+http://localhost:8080/sse
 
 ```bash
 event: endpoint
@@ -125,7 +130,7 @@ data: /messages/?session_id=fef8120bae4d49508a96fa546e613329
 ```
 启动效果
 ```bash
-(env-mcp-rag) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-rag/milvus-mcp-server# npx @modelcontextprotocol/inspector node build/index.js
+(venv_mcp_rag) root@fly:~/AI-Box/code/rag/mcp-in-action/mcp-rag/milvus-mcp-server# npx @modelcontextprotocol/inspector node build/index.js
 Starting MCP inspector...
 ⚙️ Proxy server listening on port 6277
 🔍 MCP Inspector is up and running at http://127.0.0.1:6274 🚀

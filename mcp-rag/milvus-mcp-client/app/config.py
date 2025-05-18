@@ -18,12 +18,12 @@ from loguru import logger
 load_dotenv()
 
 # MCP服务器配置
-MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://localhost:8080/sse")
+MCP_SERVER_URL = os.getenv("MCP_SERVER_URL")
 
 # LLM API配置
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "sk-paSHgQoVeKag1rou9d81Fa2f534940C1Ba394f02C45aF3D2")
-OPENAI_API_BASE = os.getenv("OPENAI_API_BASE", "https://vip.apiyi.com/v1")
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "qwen3-32b")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL")
 
 # 配置日志系统
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
