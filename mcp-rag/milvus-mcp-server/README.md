@@ -92,6 +92,7 @@ VECTOR_DIMENSION=384
 
 5. 启动服务器：
 ```bash
+export HF_ENDPOINT=https://hf-mirror.com
 python -m app.main
 ```
 启动成功信息
