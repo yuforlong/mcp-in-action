@@ -183,7 +183,7 @@ pip install -r requirements.txt
 ```
 
 4. **设置和风天气 API Key 和 API Host**：
-在`.env`文件配置`QWEATHER_API_KEY`和 `QWEATHER_API_KEY`
+在项目根目录下的`.env`文件配置`QWEATHER_API_KEY`和 `QWEATHER_API_KEY`
 
 ## 运行方式
 
