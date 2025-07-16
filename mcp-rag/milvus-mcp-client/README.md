@@ -30,6 +30,8 @@ cd milvus-mcp-client
 
 2. 安装依赖：
 ```bash
+# 激活虚拟环境（venv_mcp_rag环境，在启动Milvus MCP Server时候已经创建）
+conda activate venv_mcp_rag
 pip install -r requirements.txt
 ```
 
