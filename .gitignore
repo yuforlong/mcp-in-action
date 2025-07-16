@@ -176,5 +176,5 @@ cython_debug/
 # MCP 演示程序
 mcp-demo/venv_mcp-demo/
 mcp-rag/milvus-mcp-server/volumes/
-# mcp-demo/.env
+mcp-demo/.env
 venv_mcp-demo/*
