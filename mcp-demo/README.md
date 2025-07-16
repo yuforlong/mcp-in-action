@@ -183,7 +183,7 @@ pip install -r requirements.txt
 ```
 
 4. **设置和风天气 API Key 和 API Host**：
-在项目根目录下的`.env`文件配置`QWEATHER_API_KEY`和 `QWEATHER_API_KEY`
+修改`mcp-demo`文件夹下的`.env`文件配置`QWEATHER_API_KEY`和 `QWEATHER_API_KEY`
 
 ## 运行方式
 
@@ -456,7 +456,7 @@ LangChain版本相比原生DeepSeek版本在MCP开发中的主要优势：
 总结来说，使用LangChain框架开发MCP客户端的主要优势在于：代码更简洁、抽象层次更高、工具处理更自动化、扩展性更好，并且减少了开发者需要手动管理的复杂逻辑，特别是在多轮工具调用和消息处理方面。
 
 
-在运行客户端之前，需要配置以下环境变量。修改名为 `.env` 的文件：
+在运行客户端之前，需要配置以下环境变量。修改`mcp-demo`文件夹下名为 `.env` 的文件：
 
 ```dotenv
 # .env 文件内容示例
