@@ -29,7 +29,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 # 加载 .env 文件中的环境变量
-dotenv_path = Path(__file__).resolve().parents[1] / '.env'
+dotenv_path = Path(__file__).resolve().parents[2] / '.env'
 load_dotenv(dotenv_path)
 
 # 初始化 FastMCP 服务器
