@@ -18,6 +18,9 @@ MCP In Action 是一个实战项目，旨在帮助开发者快速掌握 Model Co
 3. [MCP实战高阶：借助LangChain快速打造MCP天气助手](https://mp.weixin.qq.com/s/Qq3C85Bi3NHDQ9MnnBZvZQ)
 4. [RAG不好用？试试MCP这个“知识库优化大师”](https://mp.weixin.qq.com/s/SOVXbU8Lw131EFCMmMlpmA)
 
+### 配套视频
+- [极客时间《MCP实战》](
+https://u.geekbang.org/subject/intro/1010607)
 ## 项目架构
 
 本仓库包含以下主要项目：

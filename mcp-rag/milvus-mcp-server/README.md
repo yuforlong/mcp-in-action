@@ -15,53 +15,12 @@
 
 ## 部署方式
 
-### 方式一：使用 Docker Compose
-
-这是最简单的部署方式，所有组件（包括 Milvus、MinIO、etcd 和 MCP 服务器）都会自动配置和启动。
-
-1. 进入项目目录：
-```bash
-cd milvus-mcp-server
-```
-
-2. 启动所有服务：
-```bash
-docker-compose up -d
-
-docker compose -f docker-compose-base.yml up -d --force-recreate
-```
-
-服务启动后，MCP 服务器将在 http://localhost:8080 上可用。
-
-各个服务的端口映射：
-- MCP 服务器: 8080
-- Milvus: 19530
-- Milvus 监控: 9091
-
-如需查看服务日志：
-```bash
-# 查看所有服务日志
-docker-compose logs -f
-
-# 查看特定服务日志（例如 mcp-server）
-docker compose logs -f mcp-server
-```
-
-停止服务：
-```bash
-docker compose down
-```
-
-### 方式二：本地开发环境
-
-如果您需要进行开发或调试，可以选择本地部署方式。
-
 1. 首先启动 Milvus 及其依赖服务：
 ```bash
 docker compose up -d etcd minio standalone
 ```
 
-2. 创建 Python 虚拟环境：
+1. 创建 Python 虚拟环境：
 ```bash
 # 在mcp-rag目录创建
 cd ..
